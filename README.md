@@ -405,7 +405,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Built with ❤️ for the football prediction community**
-
-*Version 5.0.0 - Transformed Edition*  
-*Last Updated: 2026-07-07*#   S O C C E R _ P R E D I C T O R - 2 6 - 2 7  
- 
