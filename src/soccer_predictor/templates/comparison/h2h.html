@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Head-to-Head Comparison - Soccer Predictor Pro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">⚔️ Head-to-Head Team Comparison</h1>
+    <p class="page-subtitle">Compare teams with detailed statistics and radar charts</p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Select Teams to Compare</h3>
+    </div>
+    <div style="padding: 2rem;">
+        <form id="h2hForm" style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 2rem; align-items: center;">
+            <div class="form-group">
+                <label class="form-label">Team A</label>
+                <select id="teamA" class="form-select">
+                    <option value="">Select Team...</option>
+                    <!-- Will be populated dynamically -->
+                </select>
+            </div>
+            
+            <div style="text-align: center; font-size: 2rem; color: var(--accent-blue);">VS</div>
+            
+            <div class="form-group">
+                <label class="form-label">Team B</label>
+                <select id="teamB" class="form-select">
+                    <option value="">Select Team...</option>
+                    <!-- Will be populated dynamically -->
+                </select>
+            </div>
+        </form>
+        
+        <button onclick="compareTeams()" class="btn btn-primary" style="margin-top: 2rem; width: 100%;">
+            🔍 Compare Teams
+        </button>
+    </div>
+</div>
+
+<!-- Results Section (hidden initially) -->
+<div id="resultsSection" style="display: none; margin-top: 2rem;">
+    <!-- Win Probabilities -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="homeWinProb">--%</div>
+            <div class="stat-label" id="teamAName">Team A Win</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="drawProb">--%</div>
+            <div class="stat-label">Draw</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="awayWinProb">--%</div>
+            <div class="stat-label" id="teamBName">Team B Win</div>
+        </div>
+    </div>
+    
+    <!-- Radar Chart -->
+    <div class="card" style="margin-top: 2rem;">
+        <div class="card-header">
+            <h3 class="card-title">📊 Team Strength Comparison</h3>
+        </div>
+        <div class="chart-container">
+            <canvas id="radarChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Form Comparison -->
+    <div class="content-grid" style="margin-top: 2rem;">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title" id="teamAFormTitle">Team A Form</h3>
+            </div>
+            <div id="teamAForm" style="padding: 1rem;"></div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title" id="teamBFormTitle">Team B Form</h3>
+            </div>
+            <div id="teamBForm" style="padding: 1rem;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load teams on page load
+window.addEventListener('DOMContentLoaded', () => {
+    loadTeams();
+});
+
+async function loadTeams() {
+    // In production, fetch from API
+    // For now, use sample data
+    const teams = [
+        {id: 'MCI', name: 'Manchester City'},
+        {id: 'ARS', name: 'Arsenal'},
+        {id: 'LIV', name: 'Liverpool'},
+        {id: 'CHE', name: 'Chelsea'},
+        {id: 'MUN', name: 'Manchester United'},
+        {id: 'TOT', name: 'Tottenham'},
+        {id: 'RMA', name: 'Real Madrid'},
+        {id: 'BAR', name: 'Barcelona'},
+        {id: 'INT', name: 'Inter Milan'},
+        {id: 'JUV', name: 'Juventus'},
+        {id: 'BAY', name: 'Bayern Munich'},
+        {id: 'PSG', name: 'Paris Saint-Germain'}
+    ];
+    
+    const teamASelect = document.getElementById('teamA');
+    const teamBSelect = document.getElementById('teamB');
+    
+    teams.forEach(team => {
+        teamASelect.innerHTML += `<option value="${team.id}">${team.name}</option>`;
+        teamBSelect.innerHTML += `<option value="${team.id}">${team.name}</option>`;
+    });
+}
+
+async function compareTeams() {
+    const teamAId = document.getElementById('teamA').value;
+    const teamBId = document.getElementById('teamB').value;
+    
+    if (!teamAId || !teamBId) {
+        alert('Please select both teams');
+        return;
+    }
+    
+    if (teamAId === teamBId) {
+        alert('Please select different teams');
+        return;
+    }
+    
+    // Show loading state
+    const button = event.target;
+    button.textContent = '⏳ Comparing...';
+    button.disabled = true;
+    
+    try {
+        const response = await fetch('/comparison/api/h2h', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({team_a_id: teamAId, team_b_id: teamBId})
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            displayResults(data);
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to compare teams');
+    } finally {
+        button.textContent = '🔍 Compare Teams';
+        button.disabled = false;
+    }
+}
+
+function displayResults(data) {
+    // Show results section
+    document.getElementById('resultsSection').style.display = 'block';
+    
+    // Update win probabilities
+    const probs = data.win_probabilities;
+    document.getElementById('homeWinProb').textContent = (probs.home_win_prob * 100).toFixed(1) + '%';
+    document.getElementById('drawProb').textContent = (probs.draw_prob * 100).toFixed(1) + '%';
+    document.getElementById('awayWinProb').textContent = (probs.away_win_prob * 100).toFixed(1) + '%';
+    
+    // Update team names
+    document.getElementById('teamAName').textContent = data.radar_chart.team_a.name + ' Win';
+    document.getElementById('teamBName').textContent = data.radar_chart.team_b.name + ' Win';
+    document.getElementById('teamAFormTitle').textContent = data.radar_chart.team_a.name + ' Form';
+    document.getElementById('teamBFormTitle').textContent = data.radar_chart.team_b.name + ' Form';
+    
+    // Display form
+    displayForm('teamAForm', data.form_comparison.team_a);
+    displayForm('teamBForm', data.form_comparison.team_b);
+    
+    // Create radar chart
+    createRadarChart(data.radar_chart);
+    
+    // Scroll to results
+    document.getElementById('resultsSection').scrollIntoView({behavior: 'smooth'});
+}
+
+function displayForm(elementId, form_data) {
+    const container = document.getElementById(elementId);
+    const formString = form_data.form_string.split('').map(r => {
+        const color = r === 'W' ? '#10b981' : (r === 'D' ? '#f59e0b' : '#ef4444');
+        return `<span style="display: inline-block; width: 30px; height: 30px; background: ${color}; color: white; border-radius: 50%; text-align: center; line-height: 30px; margin: 2px; font-weight: bold;">${r}</span>`;
+    }).join('');
+    
+    container.innerHTML = `
+        <div style="margin-bottom: 1rem;">
+            <strong>Recent Form:</strong><br>
+            ${formString}
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
+            <div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #10b981;">${form_data.wins}</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">Wins</div>
+            </div>
+            <div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #f59e0b;">${form_data.draws}</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">Draws</div>
+            </div>
+            <div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #ef4444;">${form_data.losses}</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">Losses</div>
+            </div>
+        </div>
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+            <strong>Last 10 Games:</strong> ${form_data.points_last_10} points
+        </div>
+    `;
+}
+
+let radarChartInstance = null;
+
+function createRadarChart(radarData) {
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    
+    if (radarChartInstance) {
+        radarChartInstance.destroy();
+    }
+    
+    radarChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: radarData.labels,
+            datasets: [{
+                label: radarData.team_a.name,
+                data: radarData.team_a.values,
+                borderColor: 'rgb(102, 126, 234)',
+                backgroundColor: 'rgba(102, 126, 234, 0.2)'
+            }, {
+                label: radarData.team_b.name,
+                data: radarData.team_b.values,
+                borderColor: 'rgb(245, 87, 108)',
+                backgroundColor: 'rgba(245, 87, 108, 0.2)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 10
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

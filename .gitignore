@@ -1,0 +1,86 @@
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+eggs/
+*.egg-info/
+dist/
+*.egg
+venv/
+env/
+ENV/
+.venv
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Flask Sessions
+flask_session/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node Modules
+node_modules/
+npm-debug.log*
+
+# Tailwind CSS Build Output (keep source, ignore compiled if you prefer)
+# src/soccer_predictor/static/css/style.css
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# mypy
+.mypy_cache/
+
+# Redis dump
+dump.rdb
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Documentation builds
+docs/_build/
+
+# VS Code
+.settings.json
+
+# Secrets - NEVER commit these
+secrets/
+keys/
+*.pem
+*.key

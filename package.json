@@ -1,0 +1,14 @@
+{
+  "name": "soccer-predictor-pro",
+  "version": "4.0.0",
+  "description": "Modern Soccer Prediction Platform with Real-Time Data",
+  "scripts": {
+    "tailwind:build": "tailwindcss -i ./src/soccer_predictor/static/css/input.css -o ./src/soccer_predictor/static/css/style.css --minify",
+    "tailwind:watch": "tailwindcss -i ./src/soccer_predictor/static/css/input.css -o ./src/soccer_predictor/static/css/style.css --watch",
+    "dev": "concurrently \"python app.py\" \"npm run tailwind:watch\""
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1",
+    "concurrently": "^8.2.2"
+  }
+}

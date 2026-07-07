@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Championship Forecast - Soccer Predictor Pro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">🏆 Championship Forecast</h1>
+    <p class="page-subtitle">Monte Carlo simulation of season outcomes</p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Configure Simulation</h3>
+    </div>
+    <div style="padding: 2rem;">
+        <form id="forecastForm">
+            <div class="form-group">
+                <label class="form-label">League</label>
+                <select id="league" class="form-select">
+                    <option value="Premier League">Premier League</option>
+                    <option value="La Liga">La Liga</option>
+                    <option value="Serie A">Serie A</option>
+                    <option value="Bundesliga">Bundesliga</option>
+                    <option value="Ligue 1">Ligue 1</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Number of Simulations</label>
+                <select id="simulations" class="form-select">
+                    <option value="5000">5,000 (Fast)</option>
+                    <option value="10000" selected>10,000 (Recommended)</option>
+                    <option value="50000">50,000 (Most Accurate)</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                🚀 Run Championship Simulation
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Results Section -->
+<div id="resultsSection" style="display: none; margin-top: 2rem;">
+    <!-- Key Insights -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">💡 Key Insights</h3>
+        </div>
+        <div id="insightsContainer" style="padding: 1rem;"></div>
+    </div>
+    
+    <!-- Championship Probabilities Chart -->
+    <div class="card" style="margin-top: 2rem;">
+        <div class="card-header">
+            <h3 class="card-title">📊 Title Race Probabilities</h3>
+        </div>
+        <div class="chart-container">
+            <canvas id="championshipChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Expected Final Table -->
+    <div class="card" style="margin-top: 2rem;">
+        <div class="card-header">
+            <h3 class="card-title">📋 Expected Final Table</h3>
+        </div>
+        <div style="overflow-x: auto;">
+            <table id="finalTable" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: var(--accent-blue); color: white;">
+                        <th style="padding: 12px; text-align: left;">Pos</th>
+                        <th style="padding: 12px; text-align: left;">Team</th>
+                        <th style="padding: 12px; text-align: center;">Expected Pts</th>
+                        <th style="padding: 12px; text-align: center;">Title %</th>
+                        <th style="padding: 12px; text-align: center;">Top 4 %</th>
+                        <th style="padding: 12px; text-align: center;">Relegation %</th>
+                    </tr>
+                </thead>
+                <tbody id="finalTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Download Report -->
+    <div style="margin-top: 2rem; text-align: center;">
+        <button onclick="downloadReport()" class="btn btn-secondary">
+            📥 Download HTML Report
+        </button>
+    </div>
+</div>
+
+<script>
+document.getElementById('forecastForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const league = document.getElementById('league').value;
+    const simulations = parseInt(document.getElementById('simulations').value);
+    
+    const button = e.target.querySelector('button[type="submit"]');
+    button.textContent = '⏳ Running simulation...';
+    button.disabled = true;
+    
+    try {
+        const response = await fetch('/comparison/api/championship', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({league, simulations})
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            displayForecast(data);
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to run forecast');
+    } finally {
+        button.textContent = '🚀 Run Championship Simulation';
+        button.disabled = false;
+    }
+});
+
+function displayForecast(data) {
+    document.getElementById('resultsSection').style.display = 'block';
+    
+    // Display insights
+    const insightsHtml = data.insights.map(insight => `
+        <div style="padding: 12px; margin: 8px 0; border-left: 4px solid ${insight.priority === 'high' ? '#ef4444' : '#f59e0b'}; background: rgba(31, 41, 55, 0.4); border-radius: 6px;">
+            ${insight.message}
+        </div>
+    `).join('');
+    document.getElementById('insightsContainer').innerHTML = insightsHtml;
+    
+    // Create championship chart
+    createChampionshipChart(data.championship_probs);
+    
+    // Populate final table
+    populateFinalTable(data);
+    
+    // Scroll to results
+    document.getElementById('resultsSection').scrollIntoView({behavior: 'smooth'});
+}
+
+let championshipChartInstance = null;
+
+function createChampionshipChart(probs) {
+    const ctx = document.getElementById('championshipChart').getContext('2d');
+    
+    if (championshipChartInstance) {
+        championshipChartInstance.destroy();
+    }
+    
+    const teams = Object.keys(probs).slice(0, 10);
+    const probabilities = teams.map(t => probs[t] * 100);
+    
+    championshipChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: teams,
+            datasets: [{
+                label: 'Championship Probability (%)',
+                data: probabilities,
+                backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                borderColor: 'rgb(102, 126, 234)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+function populateFinalTable(data) {
+    const tbody = document.getElementById('finalTableBody');
+    tbody.innerHTML = '';
+    
+    const sortedTeams = Object.entries(data.expected_final_positions)
+        .sort((a, b) => a[1] - b[1])
+        .slice(0, 20);
+    
+    sortedTeams.forEach(([team, position], idx) => {
+        const row = document.createElement('tr');
+        row.style.borderBottom = '1px solid var(--border-color)';
+        
+        const titleProb = (data.championship_probs[team] * 100).toFixed(1);
+        const top4Prob = (data.top4_probs[team] * 100).toFixed(1);
+        const relegProb = (data.relegation_probs[team] * 100).toFixed(1);
+        
+        row.innerHTML = `
+            <td style="padding: 12px;">${idx + 1}</td>
+            <td style="padding: 12px;"><strong>${team}</strong></td>
+            <td style="padding: 12px; text-align: center;">${data.expected_points[team].toFixed(1)} ± ${data.points_uncertainty[team].toFixed(1)}</td>
+            <td style="padding: 12px; text-align: center; color: ${parseFloat(titleProb) > 50 ? '#10b981' : 'inherit'}">${titleProb}%</td>
+            <td style="padding: 12px; text-align: center;">${top4Prob}%</td>
+            <td style="padding: 12px; text-align: center; color: ${parseFloat(relegProb) > 50 ? '#ef4444' : 'inherit'}">${relegProb}%</td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+}
+
+async function downloadReport() {
+    const league = document.getElementById('league').value;
+    
+    try {
+        const response = await fetch(`/comparison/api/championship/report?league=${encodeURIComponent(league)}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+            window.open(data.report_path, '_blank');
+        } else {
+            alert('Error generating report');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to download report');
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}Match Predictions{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card bg-darker border-secondary">
+            <div class="card-header border-secondary d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-light">Match Prediction</h5>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-success active" id="view-prob">Probabilities</button>
+                    <button class="btn btn-sm btn-outline-success" id="view-scores">Score Matrix</button>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if not api_configured %}
+                <!-- API Not Configured Warning -->
+                <div class="alert alert-warning" role="alert">
+                    <h5 class="alert-heading">⚠️ API Configuration Required</h5>
+                    <p>Your API keys are not configured. Please set up your API keys to access real match data.</p>
+                    <hr>
+                    <p class="mb-0">
+                        <a href="{{ url_for('setup.setup_page') }}" class="btn btn-primary">Go to Setup</a>
+                        <a href="https://www.football-data.org/" target="_blank" class="btn btn-outline-info">Get API Key</a>
+                    </p>
+                </div>
+                {% endif %}
+                
+                {% if error %}
+                <!-- Error Message -->
+                <div class="alert alert-danger" role="alert">
+                    <h5 class="alert-heading">⚠️ Prediction Error</h5>
+                    <p>{{ error }}</p>
+                    <hr>
+                    <p class="mb-0">Please try selecting a different match or contact support if the issue persists.</p>
+                </div>
+                {% elif match and prediction %}
+                {% if prediction.error %}
+                <!-- Prediction Error -->
+                <div class="alert alert-warning" role="alert">
+                    <h5 class="alert-heading">⚠️ Prediction Failed</h5>
+                    <p>{{ prediction.error }}</p>
+                    <hr>
+                    <p class="mb-0">The prediction model encountered an error. Please try again later.</p>
+                </div>
+                {% else %}
+                <!-- Match Header -->
+                <div class="text-center mb-4">
+                    <div class="row align-items-center">
+                        <div class="col-4 text-end">
+                            <h3 class="text-light mb-0">{{ match.home_team.name }}</h3>
+                            <small class="text-muted">Elo: {{ match.home_team.elo|int }}</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="display-6 text-muted">VS</div>
+                            <small class="text-muted">{{ match.league }} • Matchday {{ match.matchday }}</small>
+                        </div>
+                        <div class="col-4 text-start">
+                            <h3 class="text-light mb-0">{{ match.away_team.name }}</h3>
+                            <small class="text-muted">Elo: {{ match.away_team.elo|int }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Probability Bars -->
+                <div class="probability-bars mb-4">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-success fw-bold">{{ match.home_team.name }} Win</span>
+                            <span class="text-success">{{ (prediction.home_win * 100)|round(1) }}%</span>
+                        </div>
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar bg-success" data-width="{{ prediction.home_win * 100 }}">
+                                {{ (prediction.home_win * 100)|round(1) }}%
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-warning fw-bold">Draw</span>
+                            <span class="text-warning">{{ (prediction.draw * 100)|round(1) }}%</span>
+                        </div>
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar bg-warning text-dark" data-width="{{ prediction.draw * 100 }}">
+                                {{ (prediction.draw * 100)|round(1) }}%
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-danger fw-bold">{{ match.away_team.name }} Win</span>
+                            <span class="text-danger">{{ (prediction.away_win * 100)|round(1) }}%</span>
+                        </div>
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar bg-danger" data-width="{{ prediction.away_win * 100 }}">
+                                {{ (prediction.away_win * 100)|round(1) }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expected Goals -->
+                <div class="row text-center mb-4">
+                    <div class="col-6">
+                        <div class="p-3 bg-dark rounded">
+                            <h2 class="text-success mb-0">{{ prediction.home_xg|round(2) }}</h2>
+                            <small class="text-muted">xG {{ match.home_team.name }}</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 bg-dark rounded">
+                            <h2 class="text-danger mb-0">{{ prediction.away_xg|round(2) }}</h2>
+                            <small class="text-muted">xG {{ match.away_team.name }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Markets -->
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <div class="d-flex justify-content-between p-2 bg-dark rounded">
+                            <span class="text-muted">Both Teams to Score</span>
+                            <span class="text-light fw-bold">{{ (prediction.btts * 100)|round(1) }}%</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex justify-content-between p-2 bg-dark rounded">
+                            <span class="text-muted">Over 2.5 Goals</span>
+                            <span class="text-light fw-bold">{{ (prediction.over_25 * 100)|round(1) }}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Correct Score -->
+                <h6 class="text-light mb-3">Most Likely Scorelines</h6>
+                <div class="row g-2">
+                    {% set sorted_scores = prediction.correct_score.items()|sort(reverse=true, attribute='1')|list %}
+                    {% for score, prob in sorted_scores[:6] %}
+                    <div class="col-4 col-md-2">
+                        <div class="text-center p-2 bg-dark rounded">
+                            <div class="text-light fw-bold">{{ score }}</div>
+                            <small class="text-muted">{{ (prob * 100)|round(1) }}%</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% else %}
+                <!-- Match Selector -->
+                <div class="text-center py-5">
+                    {% if not fixtures or fixtures|length == 0 %}
+                    <h4 class="text-muted mb-3">No matches available</h4>
+                    <p class="text-muted">
+                        {% if api_configured %}
+                        No upcoming fixtures found. Check back later for new matches.
+                        {% else %}
+                        Configure your API keys to access real match data.
+                        {% endif %}
+                    </p>
+                    <a href="{{ url_for('setup.setup_page') }}" class="btn btn-primary">
+                        {% if api_configured %}Check Fixtures{% else %}Configure API{% endif %}
+                    </a>
+                    {% else %}
+                    <h4 class="text-muted mb-3">Select a match to predict</h4>
+                    <p class="text-muted">Choose from the sidebar or browse fixtures</p>
+                    <a href="{{ url_for('fixtures.fixtures_page') }}" class="btn btn-success">
+                        Browse Fixtures
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar: Match Selection -->
+    <div class="col-lg-4">
+        <div class="card bg-darker border-secondary">
+            <div class="card-header border-secondary d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 text-light">Select Match</h6>
+                {% if api_configured %}
+                <small class="text-muted">{{ fixtures|length }} available</small>
+                {% endif %}
+            </div>
+            <div class="card-body p-0">
+                {% if not api_configured %}
+                <div class="p-3 text-center text-muted">
+                    <p>API keys not configured</p>
+                    <a href="{{ url_for('setup.setup_page') }}" class="btn btn-sm btn-primary">Setup API</a>
+                </div>
+                {% else %}
+                <div class="list-group list-group-flush bg-transparent" style="max-height: 600px; overflow-y: auto;">
+                    {% for fixture in fixtures[:20] %}
+                    <a href="{{ url_for('predictions.match_prediction', match_id=fixture.match_id) }}" 
+                       class="list-group-item list-group-item-action bg-transparent text-light border-secondary">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted d-block">{{ fixture.league }} • MD{{ fixture.matchday }}</small>
+                                <span class="fw-bold">{{ fixture.home_team.name }}</span>
+                                <span class="text-muted"> vs </span>
+                                <span class="fw-bold">{{ fixture.away_team.name }}</span>
+                            </div>
+                            <span class="badge bg-dark border border-secondary">
+                                {% if fixture.home_odds %}
+                                    {{ fixture.home_odds|round(2) }} / {{ fixture.draw_odds|round(2) }} / {{ fixture.away_odds|round(2) }}
+                                {% else %}
+                                    No Odds
+                                {% endif %}
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                    {% if fixtures|length == 0 %}
+                    <div class="list-group-item bg-transparent text-muted text-center">
+                        No fixtures available
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Model Weights -->
+        {% if api_configured %}
+        <div class="card bg-darker border-secondary mt-3">
+            <div class="card-header border-secondary">
+                <h6 class="mb-0 text-light">Ensemble Weights</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="text-muted small">Poisson ({{ (session.get('ensemble_weights', {}).get('poisson', 0.40) * 100)|int }}%)</label>
+                    <input type="range" class="form-range" id="weight-poisson" min="0" max="100" value="{{ (session.get('ensemble_weights', {}).get('poisson', 0.40) * 100)|int }}">
+                </div>
+                <div class="mb-3">
+                    <label class="text-muted small">Elo ({{ (session.get('ensemble_weights', {}).get('elo', 0.25) * 100)|int }}%)</label>
+                    <input type="range" class="form-range" id="weight-elo" min="0" max="100" value="{{ (session.get('ensemble_weights', {}).get('elo', 0.25) * 100)|int }}">
+                </div>
+                <div class="mb-3">
+                    <label class="text-muted small">Market ({{ (session.get('ensemble_weights', {}).get('market', 0.20) * 100)|int }}%)</label>
+                    <input type="range" class="form-range" id="weight-market" min="0" max="100" value="{{ (session.get('ensemble_weights', {}).get('market', 0.20) * 100)|int }}">
+                </div>
+                <div class="mb-3">
+                    <label class="text-muted small">ML ({{ (session.get('ensemble_weights', {}).get('ml', 0.15) * 100)|int }}%)</label>
+                    <input type="range" class="form-range" id="weight-ml" min="0" max="100" value="{{ (session.get('ensemble_weights', {}).get('ml', 0.15) * 100)|int }}">
+                </div>
+                <button class="btn btn-sm btn-success w-100" onclick="updateWeights()">Update Weights</button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Prediction Drivers -->
+{% if prediction and prediction.drivers %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card bg-darker border-secondary">
+            <div class="card-header border-secondary">
+                <h6 class="mb-0 text-light">Prediction Drivers</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    {% for driver in prediction.drivers %}
+                    <li class="mb-2">
+                        <i class="bi bi-arrow-right text-success me-2"></i>
+                        {{ driver }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Apply progress bar widths from data attributes
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.progress-bar[data-width]').forEach(function(bar) {
+        const width = bar.getAttribute('data-width');
+        if (width) {
+            bar.style.width = width + '%';
+        }
+    });
+});
+
+function updateWeights() {
+    const poisson = document.getElementById('weight-poisson').value / 100;
+    const elo = document.getElementById('weight-elo').value / 100;
+    const market = document.getElementById('weight-market').value / 100;
+    const ml = document.getElementById('weight-ml').value / 100;
+
+    fetch('/predictions/weights', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({poisson, elo, market, ml})
+    }).then(r => r.json()).then(data => {
+        if(data.status === 'updated') location.reload();
+    });
+}
+</script>
+{% endblock %}

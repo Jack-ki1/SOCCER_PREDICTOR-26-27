@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}{{ team.name }} Analytics{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h3 class="text-light">{{ team.name }}</h3>
+            <span class="badge bg-dark border border-secondary">{{ team.league }}</span>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="col-md-3">
+        <div class="card bg-darker border-secondary">
+            <div class="card-body text-center">
+                <h2 class="text-success display-5">{{ team.elo|int }}</h2>
+                <small class="text-muted">Elo Rating</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-darker border-secondary">
+            <div class="card-body text-center">
+                <h2 class="text-info display-5">{{ team.attack|round(2) }}</h2>
+                <small class="text-muted">Attack Strength</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-darker border-secondary">
+            <div class="card-body text-center">
+                <h2 class="text-warning display-5">{{ team.defense|round(2) }}</h2>
+                <small class="text-muted">Defense Strength</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-darker border-secondary">
+            <div class="card-body text-center">
+                <h2 class="text-primary display-5">{{ team.market_value|int }}M</h2>
+                <small class="text-muted">Market Value</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trajectory Charts -->
+    <div class="col-md-6">
+        <div class="card bg-darker border-secondary">
+            <div class="card-header border-secondary">
+                <h6 class="mb-0 text-light">Elo Trajectory (6 Months)</h6>
+            </div>
+            <div class="card-body">
+                <div id="elo-trajectory-chart" style="height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-darker border-secondary">
+            <div class="card-header border-secondary">
+                <h6 class="mb-0 text-light">Form Trajectory</h6>
+            </div>
+            <div class="card-body">
+                <div id="form-trajectory-chart" style="height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Radar -->
+    <div class="col-12">
+        <div class="card bg-darker border-secondary">
+            <div class="card-header border-secondary">
+                <h6 class="mb-0 text-light">Team Profile Radar</h6>
+            </div>
+            <div class="card-body">
+                <div id="team-radar-chart" style="height: 400px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Elo Trajectory
+const eloData = {{ team.elo_trajectory|tojson }};
+Plotly.newPlot('elo-trajectory-chart', [{
+    y: eloData,
+    type: 'scatter',
+    mode: 'lines+markers',
+    line: {color: '#28a745', width: 3},
+    marker: {size: 8, color: '#28a745'},
+    fill: 'tozeroy',
+    fillcolor: 'rgba(40, 167, 69, 0.1)'
+}], {
+    paper_bgcolor: 'transparent',
+    plot_bgcolor: 'transparent',
+    font: {color: '#fff'},
+    xaxis: {title: 'Month', tickvals: [0,1,2,3,4,5], ticktext: ['T-5','T-4','T-3','T-2','T-1','Now']},
+    yaxis: {title: 'Elo Rating'},
+    margin: {t: 20}
+});
+
+// Form Trajectory
+const formData = {{ team.form_trajectory|tojson }};
+Plotly.newPlot('form-trajectory-chart', [{
+    y: formData,
+    type: 'scatter',
+    mode: 'lines+markers',
+    line: {color: '#17a2b8', width: 3},
+    marker: {size: 8, color: '#17a2b8'},
+    fill: 'tozeroy',
+    fillcolor: 'rgba(23, 162, 184, 0.1)'
+}], {
+    paper_bgcolor: 'transparent',
+    plot_bgcolor: 'transparent',
+    font: {color: '#fff'},
+    xaxis: {title: 'Month', tickvals: [0,1,2,3,4,5], ticktext: ['T-5','T-4','T-3','T-2','T-1','Now']},
+    yaxis: {title: 'Form Index', range: [-1, 1]},
+    margin: {t: 20},
+    shapes: [{
+        type: 'line', x0: 0, x1: 5, y0: 0, y1: 0,
+        line: {color: '#fff', width: 1, dash: 'dash'}
+    }]
+});
+
+// Team Radar
+Plotly.newPlot('team-radar-chart', [{
+    type: 'scatterpolar',
+    r: [{{ team.attack }}, {{ team.home_attack }}, {{ team.away_attack }}, 
+        {{ 2.0 - team.defense }}, {{ 2.0 - team.home_defense }}, {{ 2.0 - team.away_defense }},
+        {{ (team.elo - 1400) / 700 }}, {{ team.form_index + 1 }}],
+    theta: ['Attack', 'Home Attack', 'Away Attack', 'Defense', 'Home Defense', 'Away Defense', 'Elo', 'Form'],
+    fill: 'toself',
+    fillcolor: 'rgba(40, 167, 69, 0.2)',
+    line: {color: '#28a745', width: 2}
+}], {
+    paper_bgcolor: 'transparent',
+    plot_bgcolor: 'transparent',
+    font: {color: '#fff'},
+    polar: {
+        radialaxis: {visible: true, range: [0, 2]},
+        bgcolor: 'transparent'
+    },
+    margin: {t: 30}
+});
+</script>
+{% endblock %}

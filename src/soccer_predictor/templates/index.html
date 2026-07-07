@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - SOCCER PREDICTOR PRO{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    {% if not api_configured %}
+    <!-- API Not Configured Warning -->
+    <div class="alert alert-warning" role="alert">
+        <h5 class="alert-heading">⚠️ API Configuration Required</h5>
+        <p>Your API keys are not configured. Please set up your API keys to access real match data.</p>
+        <hr>
+        <p class="mb-0">
+            <a href="{{ url_for('setup.setup_page') }}" class="btn btn-primary">Go to Setup</a>
+            <a href="https://www.football-data.org/" target="_blank" class="btn btn-outline-info">Get API Key</a>
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Welcome back! Here's what's happening in football today.</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <!-- Today's Matches -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon blue">📅</div>
+                <span class="stat-badge badge-success">Live</span>
+            </div>
+            <div class="stat-value">{{ (today_matches|length) if today_matches else 0 }}</div>
+            <div class="stat-label">Matches Today</div>
+            <div class="stat-trend">
+                <span>↑</span>
+                <span>{{ "Data from API" if api_configured else "Configure API" }}</span>
+            </div>
+        </div>
+
+        <!-- High Confidence Predictions -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon green">✓</div>
+                <span class="stat-badge badge-warning">Hot</span>
+            </div>
+            <div class="stat-value">{{ (live_matches|length) if live_matches else 0 }}</div>
+            <div class="stat-label">Live Matches</div>
+            <div class="stat-trend">
+                <span>↑</span>
+                <span>{{ "Live data" if api_configured else "Requires API key" }}</span>
+            </div>
+        </div>
+
+        <!-- Value Bets -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon amber">💰</div>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Value Bets Found</div>
+            <div class="stat-trend">
+                <span>⏱</span>
+                <span>Sync to find</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- How to Predict Instructions -->
+    <div class="card" style="margin-top: 2rem;">
+        <div class="card-header">
+            <h2 class="card-title">How to Predict Matches</h2>
+        </div>
+        <div class="card-body">
+            <ol class="instructions-list">
+                <li>Navigate to the <a href="{{ url_for('fixtures.fixtures_page') }}">Fixtures</a> page to view upcoming matches</li>
+                <li>Select a match from the list to see detailed predictions</li>
+                <li>View probability breakdowns, expected goals, and likely scorelines</li>
+                <li>Adjust model weights in the sidebar to customize predictions</li>
+                <li>Check the <a href="{{ url_for('predictions.predictions_page') }}">Predictions</a> page for all upcoming match forecasts</li>
+            </ol>
+            <div class="mt-3">
+                <a href="{{ url_for('fixtures.fixtures_page') }}" class="btn btn-primary">Go to Fixtures</a>
+                <a href="{{ url_for('predictions.predictions_page') }}" class="btn btn-outline-success ms-2">View Predictions</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+        <!-- Today's Top Matches -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Today's Top Matches</h2>
+                <a href="{{ url_for('fixtures.fixtures_page') }}" class="card-link">View All →</a>
+            </div>
+
+            <div class="match-list">
+                {% if today_matches %}
+                    {% for match in today_matches[:3] %}
+                    <!-- Match Card -->
+                    <div class="match-card">
+                        <div class="match-meta">
+                            <span>{{ match.league }} • {{ match.date.strftime('%H:%M') if match.date else 'TBD' }}</span>
+                            <span class="stat-badge badge-success">Scheduled</span>
+                        </div>
+
+                        <div class="match-teams">
+                            <div class="team">
+                                <div class="team-logo">
+                                    {% if match.home_team.name.startswith('Man') %}🔵
+                                    {% elif match.home_team.name.startswith('Ars') %}🔴
+                                    {% elif match.home_team.name.startswith('Liv') %}🔴
+                                    {% elif match.home_team.name.startswith('Che') %} royalblue
+                                    {% else %}⚽{% endif %}
+                                </div>
+                                <div class="team-info">
+                                    <h4>{{ match.home_team.name }}</h4>
+                                    <p>{{ match.home_team.elo|round(0) }} ELO</p>
+                                </div>
+                            </div>
+
+                            <div class="vs-divider">
+                                <div class="vs">VS</div>
+                                <div class="time">{{ match.date.strftime('%Y-%m-%d') if match.date else 'Today' }}</div>
+                            </div>
+
+                            <div class="team away">
+                                <div class="team-logo">
+                                    {% if match.away_team.name.startswith('Man') %}🔵
+                                    {% elif match.away_team.name.startswith('Ars') %}🔴
+                                    {% elif match.away_team.name.startswith('Liv') %}🔴
+                                    {% elif match.away_team.name.startswith('Che') %} royalblue
+                                    {% else %}⚽{% endif %}
+                                </div>
+                                <div class="team-info">
+                                    <h4>{{ match.away_team.name }}</h4>
+                                    <p>{{ match.away_team.elo|round(0) }} ELO</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="probability-grid">
+                            <div class="prob-item">
+                                <div class="prob-label">Home Win</div>
+                                <div class="prob-value home">--%</div>
+                            </div>
+                            <div class="prob-item">
+                                <div class="prob-label">Draw</div>
+                                <div class="prob-value draw">--%</div>
+                            </div>
+                            <div class="prob-item">
+                                <div class="prob-label">Away Win</div>
+                                <div class="prob-value away">--%</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>
+                            {% if api_configured %}
+                            No matches scheduled for today. Check the fixtures page for upcoming matches.
+                            {% else %}
+                            API not configured. Configure your API keys to see live match data.
+                            {% endif %}
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="sidebar">
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Quick Actions</h2>
+                </div>
+                <div class="action-list">
+                    <a href="{{ url_for('predictions.predictions_page') }}" class="action-item">
+                        <div class="action-icon blue">📊</div>
+                        <div class="action-content">
+                            <div class="action-title">View Predictions</div>
+                            <div class="action-desc">See all upcoming matches</div>
+                        </div>
+                        <div class="action-arrow">→</div>
+                    </a>
+
+                    <a href="{{ url_for('leagues.leagues_page') }}" class="action-item">
+                        <div class="action-icon green">🏆</div>
+                        <div class="action-content">
+                            <div class="action-title">Run Simulation</div>
+                            <div class="action-desc">Monte Carlo league forecast</div>
+                        </div>
+                        <div class="action-arrow">→</div>
+                    </a>
+
+                    <a href="{{ url_for('export.export_page') }}" class="action-item">
+                        <div class="action-icon amber">📥</div>
+                        <div class="action-content">
+                            <div class="action-title">Export Data</div>
+                            <div class="action-desc">Download predictions as CSV</div>
+                        </div>
+                        <div class="action-arrow">→</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Activity</h2>
+                </div>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-dot green"></div>
+                        <div class="activity-content">
+                            <div class="activity-text">{{ "API Connected" if api_configured else "API Not Configured" }}</div>
+                            <div class="activity-time">{{ "Just now" if api_configured else "Configure API" }}</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-dot blue"></div>
+                        <div class="activity-content">
+                            <div class="activity-text">Database Initialized</div>
+                            <div class="activity-time">{{ data_summary.recent_results|default('Unknown') }} results</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-dot amber"></div>
+                        <div class="activity-content">
+                            <div class="activity-text">Data Sync Status</div>
+                            <div class="activity-time">{{ "Active" if api_configured else "Requires API Key" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Note: analytics charts removed from the dashboard.
+});
+</script>
+{% endblock %}
+

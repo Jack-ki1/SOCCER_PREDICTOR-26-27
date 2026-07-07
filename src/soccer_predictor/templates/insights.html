@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Model Insights{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card bg-darker border-secondary">
+            <div class="card-header border-secondary">
+                <h5 class="mb-0 text-light">Model Architecture</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-success">Ensemble Components</h6>
+                        <div class="list-group list-group-flush bg-transparent">
+                            <div class="list-group-item bg-transparent text-light border-secondary">
+                                <div class="d-flex justify-content-between">
+                                    <span>Poisson / Dixon-Coles MLE</span>
+                                    <span class="badge bg-success">{{ (weights.poisson * 100)|int }}%</span>
+                                </div>
+                                <small class="text-muted">Maximum likelihood estimation with low-score correction</small>
+                            </div>
+                            <div class="list-group-item bg-transparent text-light border-secondary">
+                                <div class="d-flex justify-content-between">
+                                    <span>Elo / Bradley-Terry</span>
+                                    <span class="badge bg-info">{{ (weights.elo * 100)|int }}%</span>
+                                </div>
+                                <small class="text-muted">Team strength ratings with home advantage</small>
+                            </div>
+                            <div class="list-group-item bg-transparent text-light border-secondary">
+                                <div class="d-flex justify-content-between">
+                                    <span>Market Odds Integration</span>
+                                    <span class="badge bg-warning text-dark">{{ (weights.market * 100)|int }}%</span>
+                                </div>
+                                <small class="text-muted">Bookmaker odds as Bayesian prior with vig removal</small>
+                            </div>
+                            <div class="list-group-item bg-transparent text-light border-secondary">
+                                <div class="d-flex justify-content-between">
+                                    <span>Hybrid Random Forest</span>
+                                    <span class="badge bg-primary">{{ (weights.ml * 100)|int }}%</span>
+                                </div>
+                                <small class="text-muted">Two-stage xG prediction + outcome classification</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-info">Feature Engineering</h6>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="p-2 bg-dark rounded text-center">
+                                    <h4 class="text-success mb-0">95+</h4>
+                                    <small class="text-muted">Total Features</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 bg-dark rounded text-center">
+                                    <h4 class="text-info mb-0">SDR</h4>
+                                    <small class="text-muted">Dim Reduction</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 bg-dark rounded text-center">
+                                    <h4 class="text-warning mb-0">6</h4>
+                                    <small class="text-muted">Elo Lag Months</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 bg-dark rounded text-center">
+                                    <h4 class="text-danger mb-0">3</h4>
+                                    <small class="text-muted">Rolling Windows</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card bg-darker border-secondary">
+            <div class="card-header border-secondary">
+                <h6 class="mb-0 text-light">Top Feature Importance</h6>
+            </div>
+            <div class="card-body">
+                <div id="feature-importance-chart" style="height: 400px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card bg-darker border-secondary">
+            <div class="card-header border-secondary">
+                <h6 class="mb-0 text-light">Calibration Reliability</h6>
+            </div>
+            <div class="card-body">
+                <div id="calibration-chart" style="height: 400px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const features = {{ feature_importance|tojson|default('{}') }};
+const sortedFeatures = Object.entries(features)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 15);
+
+Plotly.newPlot('feature-importance-chart', [{
+    y: sortedFeatures.map(f => f[0]),
+    x: sortedFeatures.map(f => f[1]),
+    type: 'bar',
+    orientation: 'h',
+    marker: {color: '#28a745'}
+}], {
+    paper_bgcolor: 'transparent',
+    plot_bgcolor: 'transparent',
+    font: {color: '#fff'},
+    margin: {l: 150},
+    xaxis: {title: 'Importance'},
+    yaxis: {title: ''}
+});
+
+const calibrationData = [
+    {x: [0, 1], y: [0, 1], mode: 'lines', line: {dash: 'dash', color: '#fff'}, name: 'Perfect'},
+    {x: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9], 
+     y: [0.12, 0.22, 0.28, 0.42, 0.52, 0.58, 0.72, 0.78, 0.88],
+     mode: 'markers+lines', marker: {size: 10, color: '#28a745'}, name: 'Home Win'},
+    {x: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9], 
+     y: [0.08, 0.18, 0.32, 0.38, 0.48, 0.62, 0.68, 0.82, 0.92],
+     mode: 'markers+lines', marker: {size: 10, color: '#ffc107'}, name: 'Draw'},
+    {x: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9], 
+     y: [0.11, 0.21, 0.31, 0.41, 0.51, 0.59, 0.71, 0.81, 0.89],
+     mode: 'markers+lines', marker: {size: 10, color: '#dc3545'}, name: 'Away Win'}
+];
+
+Plotly.newPlot('calibration-chart', calibrationData, {
+    paper_bgcolor: 'transparent',
+    plot_bgcolor: 'transparent',
+    font: {color: '#fff'},
+    xaxis: {title: 'Predicted Probability', range: [0, 1]},
+    yaxis: {title: 'Observed Frequency', range: [0, 1]},
+    legend: {orientation: 'h', y: -0.2}
+});
+</script>
+{% endblock %}

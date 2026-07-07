@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Fixtures & Results{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    {% if not api_configured %}
+    <!-- API Not Configured Warning -->
+    <div class="alert alert-warning" role="alert">
+        <h5 class="alert-heading">⚠️ API Configuration Required</h5>
+        <p>Your API keys are not configured. Please set up your API keys to access real match data.</p>
+        <hr>
+        <p class="mb-0">
+            <a href="{{ url_for('setup.setup_page') }}" class="btn btn-primary">Go to Setup</a>
+            <a href="https://www.football-data.org/" target="_blank" class="btn btn-outline-info">Get API Key</a>
+        </p>
+    </div>
+    {% endif %}
+
+    <div class="page-header fixtures-toolbar">
+        <div>
+            <h1 class="page-title">Fixtures & Results</h1>
+            <p class="page-subtitle">
+                {% if api_configured %}
+                Live API data from football-data.org
+                {% else %}
+                API not configured - configure to see live data
+                {% endif %}
+            </p>
+        </div>
+        <div class="fixture-filters">
+            <select class="form-select" onchange="filterLeague(this.value)">
+                <option value="">All Leagues</option>
+                {% for lg in leagues %}
+                <option value="{{ lg.name }}" {% if selected_league == lg.name %}selected{% endif %}>{{ lg.name }}</option>
+                {% endfor %}
+            </select>
+            {% if matchdays %}
+            <select class="form-select" onchange="filterMatchday(this.value)">
+                <option value="">All Matchdays</option>
+                {% for md in matchdays %}
+                <option value="{{ md }}" {% if selected_matchday == md %}selected{% endif %}>Matchday {{ md }}</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if api_configured %}
+    <div class="stats-grid compact-stats">
+        <div class="stat-card">
+            <div class="stat-label">Data Source</div>
+            <div class="stat-value small">{{ data_summary.source|title }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Upcoming Matches</div>
+            <div class="stat-value small">{{ data_summary.upcoming_matches }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Live Matches</div>
+            <div class="stat-value small">{{ data_summary.live_matches }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Recent Results</div>
+            <div class="stat-value small">{{ data_summary.recent_results }}</div>
+        </div>
+    </div>
+    {% else %}
+    <div class="stats-grid compact-stats">
+        <div class="stat-card">
+            <div class="stat-label">Status</div>
+            <div class="stat-value small">API Not Configured</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Action Required</div>
+            <div class="stat-value small"><a href="{{ url_for('setup.setup_page') }}">Setup Required</a></div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if live_matches %}
+    <section class="card fixture-section">
+        <div class="card-header">
+            <h2 class="card-title">Live Now</h2>
+            <span class="stat-badge badge-success">Updating via API</span>
+        </div>
+        <div class="fixture-table-wrap">
+            <table class="fixture-table">
+                <thead>
+                    <tr>
+                        <th>League</th>
+                        <th>Match</th>
+                        <th>Status</th>
+                        <th>Score</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in live_matches %}
+                    <tr>
+                        <td>{{ match.league }}</td>
+                        <td>{{ match.home_team.name }} vs {{ match.away_team.name }}</td>
+                        <td>{{ match.status }}</td>
+                        <td>{{ match.home_score|default("-", true) }} - {{ match.away_score|default("-", true) }}</td>
+                        <td><a class="btn btn-secondary compact-btn" href="{{ url_for('predictions.match_prediction', match_id=match.match_id) }}">Predict</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="card fixture-section">
+        <div class="card-header">
+            <h2 class="card-title">Upcoming Fixtures</h2>
+            <span class="stat-badge badge-warning">2026-2027</span>
+        </div>
+        <div class="fixture-table-wrap">
+            <table class="fixture-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>League</th>
+                        <th>MD</th>
+                        <th>Home</th>
+                        <th>Away</th>
+                        <th>Odds H/D/A</th>
+                        <th>Rating Gap</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in fixtures %}
+                    <tr>
+                        <td data-date="{{ match.date }}">{{ match.date }}</td>
+                        <td>{{ match.league }}</td>
+                        <td>{{ match.matchday }}</td>
+                        <td class="team-cell home">{{ match.home_team.name }}</td>
+                        <td class="team-cell away">{{ match.away_team.name }}</td>
+                        <td>{{ match.home_odds|default("-", true) }} / {{ match.draw_odds|default("-", true) }} / {{ match.away_odds|default("-", true) }}</td>
+                        <td>{{ (match.home_team.elo - match.away_team.elo)|round(0)|int }}</td>
+                        <td><a class="btn btn-primary compact-btn" href="{{ url_for('predictions.match_prediction', match_id=match.match_id) }}">Predict</a></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="empty-cell">
+                            {% if api_configured %}
+                            No upcoming fixtures found for this filter.
+                            {% else %}
+                            Configure API to see live fixtures.
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="card fixture-section">
+        <div class="card-header">
+            <h2 class="card-title">Recent Results</h2>
+            <span class="stat-badge badge-success">{{ selected_league or "Premier League" }}</span>
+        </div>
+        <div class="fixture-table-wrap">
+            <table class="fixture-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>League</th>
+                        <th>Home</th>
+                        <th>Score</th>
+                        <th>Away</th>
+                        <th>Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in results %}
+                    <tr>
+                        <td data-date="{{ match.date }}">{{ match.date }}</td>
+                        <td>{{ match.league }}</td>
+                        <td class="team-cell home">{{ match.home_team.name }}</td>
+                        <td class="score-cell">{{ match.home_score }} - {{ match.away_score }}</td>
+                        <td class="team-cell away">{{ match.away_team.name }}</td>
+                        <td>{{ match.data_source }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="empty-cell">
+                            {% if api_configured %}
+                            No finished matches yet for this league window.
+                            {% else %}
+                            Configure API to see live results.
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterLeague(league) {
+    if (league) {
+        window.location.href = `/fixtures/league/${encodeURIComponent(league)}`;
+    } else {
+        window.location.href = '/fixtures/';
+    }
+}
+
+function filterMatchday(matchday) {
+    const url = new URL(window.location.href);
+    if (matchday) {
+        url.searchParams.set('matchday', matchday);
+    } else {
+        url.searchParams.delete('matchday');
+    }
+    window.location.href = url.toString();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-date]').forEach(cell => {
+        const value = cell.getAttribute('data-date');
+        const date = new Date(`${value}T12:00:00`);
+        if (!Number.isNaN(date.getTime())) {
+            cell.textContent = date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Export{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-6 mx-auto">
+        <div class="card bg-darker border-secondary">
+            <div class="card-header border-secondary">
+                <h5 class="mb-0 text-light">Export Predictions</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Download predictions for the 2026-2027 season in your preferred format.</p>
+
+                <div class="d-grid gap-3">
+                    <button class="btn btn-success" onclick="exportData('csv')">
+                        <i class="bi bi-filetype-csv"></i> Download CSV
+                    </button>
+                    <button class="btn btn-info" onclick="exportData('json')">
+                        <i class="bi bi-filetype-json"></i> Download JSON
+                    </button>
+                    <button class="btn btn-warning text-dark" onclick="exportData('excel')">
+                        <i class="bi bi-filetype-xlsx"></i> Download Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function exportData(format) {
+    fetch('/export/predictions', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            match_ids: ['sample'],
+            format: format
+        })
+    })
+    .then(r => r.blob())
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `predictions_2026-2027.${format === 'excel' ? 'xlsx' : format}`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+    });
+}
+</script>
+{% endblock %}

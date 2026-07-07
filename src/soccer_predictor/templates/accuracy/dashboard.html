@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Accuracy Dashboard - Soccer Predictor Pro{% endblock %}
+
+{% block content %}
+<style>
+    .trend-improving { color: #10b981; }
+    .trend-declining { color: #ef4444; }
+    .trend-stable { color: #f59e0b; }
+</style>
+
+<div class="page-header">
+    <h1 class="page-title">🎯 Prediction Accuracy Dashboard</h1>
+    <p class="page-subtitle">Track model performance and prediction quality over time</p>
+</div>
+
+<!-- Summary Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon blue">📊</div>
+            <span class="stat-badge badge-success">Last 7 Days</span>
+        </div>
+        <div class="stat-value">{{ "%.1f"|format(metrics_7d.outcome_accuracy * 100) }}%</div>
+        <div class="stat-label">Outcome Accuracy</div>
+        <div class="stat-trend">
+            {% if metrics_7d.trend_indicator == 'improving' %}
+                📈 Improving
+            {% elif metrics_7d.trend_indicator == 'declining' %}
+                📉 Declining
+            {% else %}
+                ➡️ Stable
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon green">✓</div>
+            <span class="stat-badge badge-success">Last 30 Days</span>
+        </div>
+        <div class="stat-value">{{ "%.1f"|format(metrics_30d.outcome_accuracy * 100) }}%</div>
+        <div class="stat-label">Outcome Accuracy</div>
+        <div class="stat-trend">
+            {{ metrics_30d.correct_outcomes }}/{{ metrics_30d.matched_predictions }} correct
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon amber">🎲</div>
+            <span class="stat-badge badge-warning">Brier Score</span>
+        </div>
+        <div class="stat-value">{{ "%.3f"|format(metrics_30d.brier_score) }}</div>
+        <div class="stat-label">Lower is better (< 0.20 = excellent)</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon purple">💰</div>
+            <span class="stat-badge badge-success">Value Bets</span>
+        </div>
+        <div class="stat-value">{{ "%.1f"|format(metrics_30d.get('value_bet_roi', 0)) }}%</div>
+        <div class="stat-label">ROI on Value Bets</div>
+    </div>
+</div>
+
+<!-- Historical Trend Chart -->
+<div class="card" style="margin-top: 2rem;">
+    <div class="card-header">
+        <h3 class="card-title">📈 Accuracy Trend (Last 90 Days)</h3>
+    </div>
+    <div class="chart-container">
+        <canvas id="accuracyTrendChart"></canvas>
+    </div>
+</div>
+
+<!-- Detailed Metrics -->
+<div class="content-grid" style="margin-top: 2rem;">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">📊 Performance Breakdown</h3>
+        </div>
+        <div style="padding: 1rem;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 12px;"><strong>Outcome Accuracy</strong></td>
+                    <td style="padding: 12px; text-align: right;">{{ "%.1f"|format(metrics_30d.outcome_accuracy * 100) }}%</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 12px;"><strong>Exact Score Accuracy</strong></td>
+                    <td style="padding: 12px; text-align: right;">{{ "%.1f"|format(metrics_30d.score_accuracy * 100) }}%</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 12px;"><strong>Avg Home Goal Error</strong></td>
+                    <td style="padding: 12px; text-align: right;">{{ "%.2f"|format(metrics_30d.avg_home_goal_error) }}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 12px;"><strong>Avg Away Goal Error</strong></td>
+                    <td style="padding: 12px; text-align: right;">{{ "%.2f"|format(metrics_30d.avg_away_goal_error) }}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 12px;"><strong>Brier Score</strong></td>
+                    <td style="padding: 12px; text-align: right;">{{ "%.3f"|format(metrics_30d.brier_score) }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px;"><strong>Total Predictions</strong></td>
+                    <td style="padding: 12px; text-align: right;">{{ metrics_30d.total_predictions }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">⚙️ Model Status</h3>
+        </div>
+        <div style="padding: 1rem;">
+            <div style="margin-bottom: 1rem;">
+                <strong>Trend:</strong> 
+                <span class="{% if metrics_30d.trend_indicator == 'improving' %}trend-improving{% elif metrics_30d.trend_indicator == 'declining' %}trend-declining{% else %}trend-stable{% endif %}">
+                    {{ metrics_30d.trend_indicator|upper }}
+                </span>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <strong>Pending Matches:</strong> {{ metrics_90d.pending_matches }}
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <strong>Last Updated:</strong> {{ metrics_90d.generated_at[:19] }}
+            </div>
+            
+            <a href="{{ url_for('accuracy.export_predictions_csv', days=30) }}" class="btn btn-primary" style="margin-top: 1rem; display: inline-block;">
+                📥 Export CSV
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Accuracy trend chart
+const historyData = JSON.parse('{{ history|tojson|safe }}');
+const dates = historyData.map(h => h.metric_date).reverse();
+const accuracies = historyData.map(h => h.outcome_accuracy * 100).reverse();
+
+const ctx = document.getElementById('accuracyTrendChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: dates,
+        datasets: [{
+            label: 'Accuracy (%)',
+            data: accuracies,
+            borderColor: 'rgb(102, 126, 234)',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: false,
+                min: 40,
+                max: 80
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
