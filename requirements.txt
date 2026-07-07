@@ -33,6 +33,9 @@ plotly==5.18.0
 # Report Generation
 weasyprint==100.1
 
+# Web Server
+gunicorn==21.2.0
+
 # Utilities
 python-dateutil==2.8.2
 joblib==1.3.1

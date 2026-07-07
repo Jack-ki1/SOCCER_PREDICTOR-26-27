@@ -1,0 +1,11 @@
+The following files have been identified as unused in the application and can be safely removed:
+
+1. src/soccer_predictor/core/advanced_features.py
+2. src/soccer_predictor/core/api_integration.py  
+3. src/soccer_predictor/core/drift_detection.py
+4. src/soccer_predictor/core/features.py
+5. src/soccer_predictor/utils/data_utils.py
+6. src/soccer_predictor/utils/ml_utils.py
+7. src/soccer_predictor/utils/ui_utils.py
+
+These files are not imported or referenced anywhere in the main application flow and can be safely deleted to reduce project complexity.
