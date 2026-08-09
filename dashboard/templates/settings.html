@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Settings — EPL Predictor{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-intro"><div><span class="eyebrow">Control room</span><h1>Tune the lens, not the result.</h1></div><p>Explore the weights that shape forecasts and refresh the live data sources feeding the platform.</p></div>
+  <div class="football-note mb-3"><b>Model hygiene.</b><br>Change parameters deliberately and use fresh data before making a matchday call.</div>
+  <div class="plot-grid mb-3"><div class="content-plot"><span class="eyebrow">Model weight balance</span><div class="content-plot__bars"><i style="height:68%"></i><i style="height:51%"></i><i style="height:28%"></i><i style="height:74%"></i><i style="height:44%"></i><i style="height:61%"></i></div><div class="content-plot__key"><span>Attack · form · venue · rho</span><b>Adjust below</b></div></div><div class="football-note"><b>Transparent by design.</b><br>Every output is a probability distribution. No single number is a promise.</div></div>
+  <div class="card">
+    <h3 style="margin-top:0;">Live data</h3>
+    <p class="sub fs-12">Pull real, Premier-League-published team ratings from the FPL API.</p>
+    <button class="btn glow-btn" onclick="refreshLive()">Refresh live ratings</button>
+    <div id="live-status" class="sub fs-12 mt-2"></div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3 style="margin-top:0;">Engine parameters</h3>
+      <div class="mt-3">
+        <label class="fs-11 muted">HOME ADVANTAGE WEIGHT: <span id="haw-val">{{ weights.home_advantage_weight }}</span>/100</label><br>
+        <input type="range" min="0" max="100" value="{{ weights.home_advantage_weight }}" id="haw" oninput="document.getElementById('haw-val').textContent=this.value" style="width:100%;">
+      </div>
+      <div class="mt-3">
+        <label class="fs-11 muted">RECENT FORM WEIGHT: <span id="rfw-val">{{ weights.recent_form_weight }}</span>/100</label><br>
+        <input type="range" min="0" max="100" value="{{ weights.recent_form_weight }}" id="rfw" oninput="document.getElementById('rfw-val').textContent=this.value" style="width:100%;">
+      </div>
+      <div class="mt-3">
+        <label class="fs-11 muted">DIXON-COLES RHO: <span id="rho-val">{{ weights.dixon_coles_rho }}</span></label><br>
+        <input type="range" min="-0.25" max="0.05" step="0.01" value="{{ weights.dixon_coles_rho }}" id="rho" oninput="document.getElementById('rho-val').textContent=this.value" style="width:100%;">
+      </div>
+      <p class="fs-11 sub mt-2">These map to <code>?home_advantage_weight=&recent_form_weight=&dixon_coles_rho=</code> query params on every <code>/api/v1/predict</code> and <code>/api/v1/simulate-season</code> call — the Dashboard/Table pages use the defaults; wire these controls up to those calls if you want live re-tuning end to end.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Market accuracy — what's realistic</h3>
+      <div id="market-accuracy"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">Engine roadmap</h3>
+    <div id="roadmap"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">Methodology & how to extend this</h3>
+    <div class="fs-12 sub" style="line-height:1.8;">
+      <p><b style="color:var(--text);">Engine:</b> attack/defence ratios feed a Dixon &amp; Coles (1997) bivariate Poisson model — the same low-score correlation fix (rho) used across most open football-prediction repos — then <code>engine/monte_carlo.py</code> runs a server-side Monte Carlo over all 380 fixtures for title/top-4/relegation probabilities.</p>
+      <p><b style="color:var(--text);">Real data:</b> the "Refresh live ratings" button above pulls from the official FPL API. For training a proper fitted model, run <code>scripts/fetch_historical_data.py</code> to pull real historical results via <code>soccerdata</code> (FBref-backed), then feed <code>engine/feature_engineering.py</code> and <code>engine/ml_models.py</code>.</p>
+      <p><b style="color:var(--text);">Realistic ceiling:</b> published ensembles (Dixon-Coles + market odds + text signals) have reported ~63% match-result accuracy on the Premier League — treat any single-model claim meaningfully above that with suspicion, including this project's, until <code>scripts/measure_accuracy.py</code> proves otherwise on real results.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='settings-experience.js') }}"></script>
+<script>
+async function refreshLive() {
+  const status = document.getElementById('live-status');
+  status.textContent = 'Refreshing...';
+  try {
+    const r = await apiPost('/live-data/refresh?season=2026-27', {});
+    status.textContent = r.ok ? `Updated ${r.teams_updated} clubs from the FPL API` : `Not updated: ${r.error}`;
+  } catch (e) {
+    status.textContent = `Failed: ${e.message}`;
+  }
+}
+async function loadMeta() {
+  const meta = await apiGet('/model/metadata');
+  document.getElementById('roadmap').innerHTML = meta.roadmap.map(s => `
+    <div class="flex justify-between items-center mb-2">
+      <span>${s.version} - ${s.name}</span>
+      <span class="pill ${s.status === 'active' ? 'pill-lime' : ''}">${s.status === 'active' ? 'Live' : 'Planned'}</span>
+    </div>
+  `).join('');
+
+  const markets = [
+    { label: 'Match Result', acc: '~55%', note: 'The hardest honest three-way market. Ensembles blending Dixon-Coles + market odds + text signals have reported ~63%.' },
+    { label: 'Both Teams to Score', acc: '~58%', note: 'A two-way market on independent scoring events — usually better calibrated than 1X2.' },
+    { label: 'Over/Under 2.5 Goals', acc: '~57%', note: 'Total-goals markets are efficiently priced by bookmakers, but stay tractable for a Poisson model.' },
+    { label: 'Correct Score', acc: '~19%', note: 'The single hardest target — the modal scoreline is right well under 1 time in 5.' },
+  ];
+  document.getElementById('market-accuracy').innerHTML = markets.map(m => `
+    <div class="mb-3" style="padding-top:8px; border-top:1px solid var(--border);">
+      <div class="flex justify-between"><b class="fs-12">${m.label}</b><span style="color:var(--purple); font-weight:800;">${m.acc}</span></div>
+      <div class="fs-11 sub mt-1">${m.note}</div>
+    </div>`).join('');
+}
+window.addEventListener('DOMContentLoaded', loadMeta);
+</script>
+{% endblock %}

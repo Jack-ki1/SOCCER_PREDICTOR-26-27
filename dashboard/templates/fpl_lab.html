@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}FPL Lab — EPL Predictor{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-intro"><div><span class="eyebrow">Fantasy decision room</span><h1>Build your edge before deadline.</h1></div><p>Captaincy and clean-sheet signals from the same match model, reworked for your gameweek choices.</p></div>
+  <div class="content-plot mb-3"><span class="eyebrow">Gameweek energy map</span><div class="content-plot__bars"><i style="height:42%"></i><i style="height:71%"></i><i style="height:55%"></i><i style="height:83%"></i><i style="height:37%"></i><i style="height:68%"></i><i style="height:92%"></i><i style="height:49%"></i><i style="height:76%"></i></div><div class="content-plot__key"><span>Relative captain opportunity</span><b>Captain + clean-sheet signals</b></div></div>
+  <div class="card">
+    <div class="flex justify-between items-center mb-3">
+      <h2 style="margin:0;">FPL Lab — captaincy & clean-sheet companion</h2>
+      <select id="gameweek" onchange="load()">
+        {% for gw in range(1, total_matchweeks + 1) %}<option value="{{ gw }}">Gameweek {{ gw }}</option>{% endfor %}
+      </select>
+    </div>
+    <p class="sub fs-12">Same engine, aimed at Fantasy Premier League decisions: a Captain Score (expected goals weighted by win probability) and clean-sheet odds for every side this gameweek — no ownership data plugged in, pair this with your own differential check.</p>
+    <div class="grid grid-2 mt-3">
+      <div>
+        <div class="pill pill-lime mb-2">Captain Watch</div>
+        <div id="captain-watch"></div>
+      </div>
+      <div>
+        <div class="pill mb-2">Clean Sheet Watch</div>
+        <div id="clean-sheet-watch"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">How FPL managers can use this</h3>
+    <ul class="fs-12 sub" style="line-height:1.9; padding-left:18px;">
+      <li><b style="color:var(--text);">Captaincy:</b> Captain Score blends expected goals with win probability — a strong favourite at home usually outranks a small favourite away.</li>
+      <li><b style="color:var(--text);">Defence picks:</b> clean-sheet odds above come straight from the scoreline grid — handy for GK/defender selection each gameweek.</li>
+      <li><b style="color:var(--text);">Transfer timing:</b> compare a team's home vs away xG across a few gameweeks on the Fixtures page to spot a good run before it's obvious.</li>
+      <li><b style="color:var(--text);">Rotation risk:</b> 9 clubs play in Europe this season — fixture congestion isn't fully modelled in the live odds yet (see <code>engine/fatigue_model.py</code>), so double-check midweek fixtures before captaining their forwards.</li>
+      <li><b style="color:var(--text);">Differentials:</b> bring your own ownership % — cross it against Captain Score to find high-upside, low-ownership picks.</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='fpl-experience.js') }}"></script>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+<script>
+async function load() {
+  const gw = document.getElementById('gameweek').value || 1;
+  const teams = await getTeams();
+  const data = await apiGet(`/fpl/captain-picks?matchweek=${gw}`);
+  renderFplLabRows(data.rows, 'captain-watch', 'captain_score', r => r.xg.toFixed(2) + ' xG', teams);
+  renderFplLabRows(data.rows, 'clean-sheet-watch', 'clean_sheet_prob', r => pct(r.clean_sheet_prob), teams);
+}
+window.addEventListener('DOMContentLoaded', load);
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Table — EPL Predictor{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-intro"><div><span class="eyebrow">Monte Carlo theatre</span><h1>Not a table. A thousand possible seasons.</h1></div><p>Run the simulation to reveal the model's picture of the title race, European places and survival battle.</p></div>
+  <div class="content-plot mb-3"><span class="eyebrow">Simulation pathway</span><div class="content-plot__bars"><i style="height:22%"></i><i style="height:35%"></i><i style="height:48%"></i><i style="height:43%"></i><i style="height:62%"></i><i style="height:54%"></i><i style="height:75%"></i><i style="height:68%"></i><i style="height:88%"></i><i style="height:92%"></i></div><div class="content-plot__key"><span>Fixture outcomes become final tables</span><b>300 simulations</b></div></div>
+  <div class="card">
+    <div class="flex justify-between items-center mb-3">
+      <h2 style="margin:0;">Projected final table — Monte Carlo simulation</h2>
+      <button class="btn glow-btn" id="run-btn" onclick="runSimulation()">Run Season Simulation</button>
+    </div>
+    <p class="sub fs-12">No matches have been played yet — this is a pre-season projection, run on demand server-side.</p>
+    <div id="sim-loader"></div>
+    <table id="table-body" style="margin-top:12px; display:none;">
+      <thead>
+        <tr><th>#</th><th>Club</th><th>Form</th><th>Pts</th><th>Title</th><th>Top 4</th><th>Releg.</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <div class="card" id="chart-card" style="display:none;">
+    <h3 style="margin-top:0;">Title & top-4 race</h3>
+    <canvas id="title-race-chart" height="220"></canvas>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='table-experience.js') }}"></script>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+<script>
+async function runSimulation() {
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true;
+  const steps = ['Loading all 380 fixtures...', 'Rolling the Poisson dice...', 'Crunching 300 simulated seasons...', 'Ranking final tables...'];
+  runStagedLoader('sim-loader', steps, 340, async () => {
+    document.getElementById('sim-loader').innerHTML = '';
+    try {
+      const data = await apiPost('/simulate-season', { n_sims: 300 });
+      await renderTable(data.projection);
+      document.getElementById('table-body').style.display = 'table';
+      document.getElementById('chart-card').style.display = 'block';
+    } finally {
+      btn.disabled = false;
+    }
+  });
+}
+</script>
+{% endblock %}

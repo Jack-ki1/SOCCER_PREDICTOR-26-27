@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Fixtures — EPL Predictor{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-intro"><div><span class="eyebrow">The calendar</span><h1>Every matchweek, in view.</h1></div><p>Use the fixture wall to spot momentum, rest windows and the runs that can reshape a season.</p></div>
+  <div class="plot-grid mb-3"><div class="mini-pitch"><span class="pitch-dot" style="top:22%;left:21%">1</span><span class="pitch-dot pitch-dot--lime" style="top:39%;left:43%">2</span><span class="pitch-dot" style="top:66%;left:72%">3</span><span class="pitch-dot pitch-dot--lime" style="top:26%;right:17%">4</span><span class="pitch-dot" style="bottom:13%;left:39%">5</span></div><div class="football-note"><b>Fixture rhythm.</b><br>Choose a matchweek, then jump directly into the match centre for a full scoreline forecast.</div></div>
+  <div class="card">
+    <h2 style="margin-top:0;">Full 38-matchweek schedule</h2>
+    <p class="sub fs-12">Matchweek 1 is the real confirmed opening round. Matchweeks 2–38 are a generated double round-robin standing in for the staged official release.</p>
+    <div class="grid grid-3" id="matchweek-grid" style="margin-top:16px;"></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='fixtures-experience.js') }}"></script>
+<script>
+async function loadAllFixtures() {
+  const teams = await getTeams();
+  const data = await apiGet('/fixtures');
+  const byRound = {};
+  data.fixtures.forEach(f => {
+    (byRound[f.round] = byRound[f.round] || []).push(f);
+  });
+
+  const grid = document.getElementById('matchweek-grid');
+  grid.innerHTML = Object.keys(byRound).sort((a,b) => a - b).map(round => {
+    const fixtures = byRound[round];
+    const confirmed = fixtures[0].is_confirmed;
+    return `
+      <div class="card" style="margin:0;">
+        <div class="flex justify-between items-center mb-2">
+          <span style="font-weight:800; font-size:13px;">Matchweek ${round}</span>
+          <span class="pill ${confirmed ? 'pill-lime' : ''}">${confirmed ? 'Confirmed' : 'Generated'}</span>
+        </div>
+        ${fixtures.slice(0, 4).map(f => {
+          const home = teams[f.home_id], away = teams[f.away_id];
+          return `<div class="flex items-center gap-2 fs-11 mb-2">
+            ${crestHTML(home, 18)} <span class="sub">${home ? home.short : f.home_id.toUpperCase()} v ${away ? away.short : f.away_id.toUpperCase()}</span> ${crestHTML(away, 18)}
+          </div>`;
+        }).join('')}
+        <a href="/dashboard?home=${fixtures[0].home_id}&away=${fixtures[0].away_id}" class="fs-10" style="color:var(--lime); font-weight:700; text-transform:uppercase;">View predictions →</a>
+      </div>`;
+  }).join('');
+}
+window.addEventListener('DOMContentLoaded', loadAllFixtures);
+</script>
+{% endblock %}

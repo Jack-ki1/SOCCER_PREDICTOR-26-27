@@ -1,0 +1,1 @@
+document.addEventListener('DOMContentLoaded', () => { document.querySelector('#run-btn')?.addEventListener('click', () => document.querySelector('#chart-card')?.scrollIntoView({ behavior:'smooth', block:'nearest' })); });

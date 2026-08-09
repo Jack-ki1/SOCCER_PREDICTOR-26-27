@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Head-to-Head — EPL Predictor{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-intro"><div><span class="eyebrow">Match laboratory</span><h1>Put any two clubs under the lights.</h1></div><p>Set the home and away sides, then let the model visualise the strength gap and likely scorelines.</p></div>
+  <div class="card">
+    <h2 style="margin-top:0;">Head-to-head</h2>
+    <p class="sub fs-12">No verified historical meeting log is loaded — this compares current strength ratings only, as if team A hosted team B.</p>
+    <div class="flex gap-3 mb-3" style="flex-wrap:wrap;">
+      <select id="team-a">
+        {% for t in teams %}<option value="{{ t.id }}" {{ 'selected' if t.id=='ars' }}>{{ t.name }} (Home)</option>{% endfor %}
+      </select>
+      <span class="sub" style="align-self:center;">vs</span>
+      <select id="team-b">
+        {% for t in teams %}<option value="{{ t.id }}" {{ 'selected' if t.id=='liv' }}>{{ t.name }} (Away)</option>{% endfor %}
+      </select>
+      <button class="btn" onclick="compare()">Compare</button>
+    </div>
+    <div id="prob-result"></div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3 style="margin-top:0;">Strength comparison</h3>
+      <canvas id="h2h-radar"></canvas>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">Likeliest scorelines</h3>
+      <div id="scorelines"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='h2h-experience.js') }}"></script>
+<script>
+let h2hChart = null;
+async function compare() {
+  const a = document.getElementById('team-a').value;
+  const b = document.getElementById('team-b').value;
+  const teams = await getTeams();
+  const teamA = teams[a], teamB = teams[b];
+  const p = await apiGet(`/predict/${a}/${b}`);
+
+  document.getElementById('prob-result').innerHTML = `
+    ${probBarHTML(p.p_home, p.p_draw, p.p_away, teamA.color, teamB.color)}
+    <div class="flex justify-between fs-12 mt-2">
+      <span style="color:${teamA.color}; font-weight:800;">${pct(p.p_home)} ${teamA.short}</span>
+      <span>${pct(p.p_draw)} DRAW</span>
+      <span style="color:${teamB.color}; font-weight:800;">${pct(p.p_away)} ${teamB.short}</span>
+    </div>`;
+
+  document.getElementById('scorelines').innerHTML = p.top_scorelines.map(s => `
+    <div class="flex justify-between fs-12" style="padding:8px 0; border-top:1px solid var(--border);">
+      <span style="font-family:monospace; font-weight:700;">${s[0]}</span><span class="sub">${pct(s[1])}</span>
+    </div>`).join('');
+
+  applyChartDefaults();
+  const formScore = t => t.form ? t.form.reduce((s,r)=> s + (r==='W'?20:r==='D'?7:0), 0) : 50;
+  const ctx = document.getElementById('h2h-radar');
+  if (h2hChart) h2hChart.destroy();
+  h2hChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: ['Attack','Defence','Home Edge','Discipline','Form'],
+      datasets: [
+        { label: teamA.short, data: [teamA.attack,teamA.defense,teamA.home_adv,teamA.discipline,formScore(teamA)], borderColor: teamA.color, backgroundColor: teamA.color+'44' },
+        { label: teamB.short, data: [teamB.attack,teamB.defense,teamB.home_adv,teamB.discipline,formScore(teamB)], borderColor: teamB.color, backgroundColor: teamB.color+'44' },
+      ],
+    },
+    options: { responsive: true, maintainAspectRatio: true, aspectRatio: 1.2, scales: { r: { min:0, max:100, ticks: { display:false } } } },
+  });
+}
+window.addEventListener('DOMContentLoaded', compare);
+</script>
+{% endblock %}

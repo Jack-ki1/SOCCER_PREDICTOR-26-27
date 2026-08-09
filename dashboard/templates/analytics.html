@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Analytics — EPL Predictor{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-intro"><div><span class="eyebrow">Club intelligence</span><h1>Twenty identities. One league.</h1></div><p>Explore the attributes behind every forecast. Attack, defence and home advantage are shown as model signals, not final truths.</p></div>
+  <div class="plot-grid mb-3"><div class="content-plot"><span class="eyebrow">League attacking profile</span><div class="content-plot__bars"><i style="height:34%"></i><i style="height:63%"></i><i style="height:47%"></i><i style="height:82%"></i><i style="height:53%"></i><i style="height:76%"></i><i style="height:41%"></i><i style="height:68%"></i><i style="height:58%"></i><i style="height:89%"></i><i style="height:50%"></i><i style="height:72%"></i></div><div class="content-plot__key"><span>Relative attacking signal</span><b>Model view</b></div></div><div class="football-note"><b>Read the shape.</b><br>Hover each club card to compare the blended team ratings.</div></div>
+  <div class="card">
+    <h2 style="margin-top:0;">All 20 clubs — attack / defence / home edge</h2>
+    <p class="sub fs-12">Illustrative model inputs, not scraped provider data — see Settings to pull live ratings.</p>
+    <div class="grid grid-3" id="team-grid"></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='analytics-experience.js') }}"></script>
+<script src="{{ url_for('static', filename='analytics.js') }}"></script>
+<script>
+window.addEventListener('DOMContentLoaded', () => renderTeamGrid({{ teams | tojson }}));
+</script>
+{% endblock %}

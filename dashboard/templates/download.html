@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Downloads — EPL Predictor{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-intro"><div><span class="eyebrow">Downloads</span><h1>Your forecasting toolkit.</h1></div><p>Export the raw calendar, forecast data and season report in the format you need.</p></div>
+  <div class="card">
+    <h2 style="margin-top:0;">Download center</h2>
+    <p class="sub fs-12">Every link below streams a real file generated server-side — nothing here is a placeholder.</p>
+    <table>
+      <thead><tr><th>File</th><th>Format</th><th></th></tr></thead>
+      <tbody>
+        <tr><td>Full 380-fixture schedule</td><td>CSV</td><td><a class="btn btn-outline" href="{{ url_for('downloads.download_fixtures_csv') }}">Download</a></td></tr>
+        <tr><td>Matchweek 1 predictions</td><td>CSV</td><td><a class="btn btn-outline" href="{{ url_for('downloads.download_predictions_csv', matchweek=1) }}">Download</a></td></tr>
+        <tr><td>Matchweek 1 predictions</td><td>XLSX</td><td><a class="btn btn-outline" href="{{ url_for('downloads.download_predictions_xlsx', matchweek=1) }}">Download</a></td></tr>
+        <tr><td>Season report (300-sim Monte Carlo)</td><td>PDF</td><td><a class="btn btn-outline" href="{{ url_for('downloads.download_season_report_pdf') }}">Download</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='download-experience.js') }}"></script>{% endblock %}

@@ -1,0 +1,1 @@
+document.addEventListener('DOMContentLoaded', () => { document.querySelectorAll('input[type=range]').forEach((input) => input.addEventListener('input', () => input.style.setProperty('--range-value', `${input.value}%`))); });
