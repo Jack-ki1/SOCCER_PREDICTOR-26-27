@@ -2,37 +2,152 @@
 {% block title %}FPL Lab — EPL Predictor{% endblock %}
 {% block content %}
 <div class="container">
-  <div class="page-intro"><div><span class="eyebrow">Fantasy decision room</span><h1>Build your edge before deadline.</h1></div><p>Captaincy and clean-sheet signals from the same match model, reworked for your gameweek choices.</p></div>
-  <div class="content-plot mb-3"><span class="eyebrow">Gameweek energy map</span><div class="content-plot__bars"><i style="height:42%"></i><i style="height:71%"></i><i style="height:55%"></i><i style="height:83%"></i><i style="height:37%"></i><i style="height:68%"></i><i style="height:92%"></i><i style="height:49%"></i><i style="height:76%"></i></div><div class="content-plot__key"><span>Relative captain opportunity</span><b>Captain + clean-sheet signals</b></div></div>
-  <div class="card">
+  <!-- Enhanced Page Intro -->
+  <div class="page-intro animate-on-scroll">
+    <div>
+      <span class="eyebrow">Fantasy decision room</span>
+      <h1>Build your edge before deadline.</h1>
+    </div>
+    <p>Captaincy and clean-sheet signals from the same match model, reworked for your gameweek choices.</p>
+  </div>
+  
+  <!-- Enhanced Content Plot -->
+  <div class="content-plot mb-3 animate-on-scroll">
+    <span class="eyebrow">Gameweek energy map</span>
+    <div class="content-plot__bars">
+      <i style="height:42%"></i>
+      <i style="height:71%"></i>
+      <i style="height:55%"></i>
+      <i style="height:83%"></i>
+      <i style="height:37%"></i>
+      <i style="height:68%"></i>
+      <i style="height:92%"></i>
+      <i style="height:49%"></i>
+      <i style="height:76%"></i>
+    </div>
+    <div class="content-plot__key">
+      <span>Relative captain opportunity</span>
+      <b>Captain + clean-sheet signals</b>
+    </div>
+  </div>
+  
+  <!-- Enhanced FPL Lab Card -->
+  <div class="card card-premium">
     <div class="flex justify-between items-center mb-3">
       <h2 style="margin:0;">FPL Lab — captaincy & clean-sheet companion</h2>
-      <select id="gameweek" onchange="load()">
-        {% for gw in range(1, total_matchweeks + 1) %}<option value="{{ gw }}">Gameweek {{ gw }}</option>{% endfor %}
-      </select>
+      <div class="fpl-controls">
+        <select id="gameweek" class="gameweek-selector" onchange="load()">
+          {% for gw in range(1, total_matchweeks + 1) %}
+          <option value="{{ gw }}">Gameweek {{ gw }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="exportFPLData()">Export</button>
+      </div>
     </div>
     <p class="sub fs-12">Same engine, aimed at Fantasy Premier League decisions: a Captain Score (expected goals weighted by win probability) and clean-sheet odds for every side this gameweek — no ownership data plugged in, pair this with your own differential check.</p>
+    
+    <!-- Enhanced FPL Grid -->
     <div class="grid grid-2 mt-3">
+      <!-- Captain Watch -->
       <div>
         <div class="pill pill-lime mb-2">Captain Watch</div>
-        <div id="captain-watch"></div>
+        <div class="fpl-lab-card" id="captain-watch">
+          <div class="fpl-loading">Loading captain data...</div>
+        </div>
       </div>
+      
+      <!-- Clean Sheet Watch -->
       <div>
         <div class="pill mb-2">Clean Sheet Watch</div>
-        <div id="clean-sheet-watch"></div>
+        <div class="fpl-lab-card" id="clean-sheet-watch">
+          <div class="fpl-loading">Loading clean sheet data...</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Enhanced Differential Finder -->
+    <div class="mt-3">
+      <div class="pill pill-lime mb-2">Differential Finder</div>
+      <div class="fpl-lab-card" id="differential-finder">
+        <div class="fpl-loading">Loading differential data...</div>
+      </div>
+    </div>
+    
+    <!-- Fixture Difficulty Ratings -->
+    <div class="mt-3">
+      <div class="pill mb-2">Fixture Difficulty</div>
+      <div class="fpl-lab-card" id="fixture-difficulty">
+        <div class="fpl-loading">Loading fixture difficulty...</div>
       </div>
     </div>
   </div>
 
+  <!-- Enhanced FPL Guide -->
   <div class="card">
     <h3 style="margin-top:0;">How FPL managers can use this</h3>
-    <ul class="fs-12 sub" style="line-height:1.9; padding-left:18px;">
-      <li><b style="color:var(--text);">Captaincy:</b> Captain Score blends expected goals with win probability — a strong favourite at home usually outranks a small favourite away.</li>
-      <li><b style="color:var(--text);">Defence picks:</b> clean-sheet odds above come straight from the scoreline grid — handy for GK/defender selection each gameweek.</li>
-      <li><b style="color:var(--text);">Transfer timing:</b> compare a team's home vs away xG across a few gameweeks on the Fixtures page to spot a good run before it's obvious.</li>
-      <li><b style="color:var(--text);">Rotation risk:</b> 9 clubs play in Europe this season — fixture congestion isn't fully modelled in the live odds yet (see <code>engine/fatigue_model.py</code>), so double-check midweek fixtures before captaining their forwards.</li>
-      <li><b style="color:var(--text);">Differentials:</b> bring your own ownership % — cross it against Captain Score to find high-upside, low-ownership picks.</li>
-    </ul>
+    <div class="fpl-guide-grid">
+      <div class="fpl-guide-item">
+        <span class="guide-icon">🎯</span>
+        <div>
+          <strong>Captaincy:</strong>
+          <small>Captain Score blends expected goals with win probability — a strong favourite at home usually outranks a small favourite away.</small>
+        </div>
+      </div>
+      <div class="fpl-guide-item">
+        <span class="guide-icon">🧤</span>
+        <div>
+          <strong>Defence picks:</strong>
+          <small>Clean-sheet odds above come straight from the scoreline grid — handy for GK/defender selection each gameweek.</small>
+        </div>
+      </div>
+      <div class="fpl-guide-item">
+        <span class="guide-icon">📅</span>
+        <div>
+          <strong>Transfer timing:</strong>
+          <small>Compare a team's home vs away xG across a few gameweeks on the Fixtures page to spot a good run before it's obvious.</small>
+        </div>
+      </div>
+      <div class="fpl-guide-item">
+        <span class="guide-icon">🔄</span>
+        <div>
+          <strong>Rotation risk:</strong>
+          <small>9 clubs play in Europe this season — fixture congestion isn't fully modelled in the live odds yet, so double-check midweek fixtures before captaining their forwards.</small>
+        </div>
+      </div>
+      <div class="fpl-guide-item">
+        <span class="guide-icon">💎</span>
+        <div>
+          <strong>Differentials:</strong>
+          <small>Bring your own ownership % — cross it against Captain Score to find high-upside, low-ownership picks.</small>
+        </div>
+      </div>
+      <div class="fpl-guide-item">
+        <span class="guide-icon">⚡</span>
+        <div>
+          <strong>Bench boost:</strong>
+          <small>Use the clean-sheet probabilities to identify which bench players might actually return points through defensive bonus points.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- FPL Tips & Strategies -->
+  <div class="card">
+    <h3>Advanced FPL Strategies</h3>
+    <div class="fpl-strategies">
+      <div class="strategy-card">
+        <h4>🏆 Template Team Building</h4>
+        <p>Use our captain scores to identify the core 3-4 players you want to build around, then fill in with budget options from teams with favorable fixtures.</p>
+      </div>
+      <div class="strategy-card">
+        <h4>📊 Form vs Fixture</h4>
+        <p>Don't just chase form. Our fixture difficulty ratings help you identify when it's worth targeting an in-form team vs when to avoid a tough run.</p>
+      </div>
+      <div class="strategy-card">
+        <h4>⏰ Chip Timing</h4>
+        <p>Plan your Triple Captain, Bench Boost, and Wildcard chips using our gameweek-by-gameweek difficulty projections.</p>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -44,9 +159,108 @@ async function load() {
   const gw = document.getElementById('gameweek').value || 1;
   const teams = await getTeams();
   const data = await apiGet(`/fpl/captain-picks?matchweek=${gw}`);
+  
   renderFplLabRows(data.rows, 'captain-watch', 'captain_score', r => r.xg.toFixed(2) + ' xG', teams);
   renderFplLabRows(data.rows, 'clean-sheet-watch', 'clean_sheet_prob', r => pct(r.clean_sheet_prob), teams);
+  renderDifferentialFinder(data.rows, teams);
+  renderFixtureDifficulty(data.rows, teams);
 }
+
+function renderFplLabRows(rows, targetId, sortKey, valueFormatter, teams) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  const sorted = [...rows].sort((a, b) => b[sortKey] - a[sortKey]).slice(0, 5);
+  el.innerHTML = sorted.map((r, i) => {
+    const t = teams ? teams[r.club_id] : null;
+    const isTopPick = i === 0;
+    return `<div class="flex justify-between items-center card fpl-row" style="margin:0 0 8px; padding:12px 16px; ${isTopPick ? 'border-color:var(--lime); background:rgba(0,255,133,0.05);' : ''}">
+      <span class="flex items-center gap-2">
+        ${t ? crestHTML(t, 24) : ''} 
+        <span class="fpl-team-name">${r.club_name}</span>
+        <span class="muted fs-11 fpl-venue">${r.venue} vs ${r.opponent}</span>
+        ${isTopPick ? '<span class="fpl-badge">TOP PICK</span>' : ''}
+      </span>
+      <span class="fpl-value" style="font-weight:800; color: ${isTopPick ? 'var(--pl-green)' : 'var(--text)'};">${valueFormatter(r)}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderDifferentialFinder(rows, teams) {
+  const el = document.getElementById('differential-finder');
+  if (!el) return;
+  
+  // Calculate differential potential (high captain score but likely low ownership)
+  const differentials = rows.map(r => ({
+    ...r,
+    differentialScore: r.captain_score * (r.venue === 'A' ? 1.2 : 1.0) // Away players often differentials
+  })).sort((a, b) => b.differentialScore - a.differentialScore).slice(0, 5);
+  
+  el.innerHTML = differentials.map((r, i) => {
+    const t = teams[r.club_id];
+    return `<div class="flex justify-between items-center card fpl-row" style="margin:0 0 8px; padding:12px 16px;">
+      <span class="flex items-center gap-2">
+        ${t ? crestHTML(t, 24) : ''} 
+        <span class="fpl-team-name">${r.club_name}</span>
+        <span class="muted fs-11 fpl-venue">${r.venue} vs ${r.opponent}</span>
+        <span class="fpl-badge fpl-badge--differential">DIFFERENTIAL</span>
+      </span>
+      <span class="fpl-value" style="font-weight:800;">${r.captain_score.toFixed(2)} CS</span>
+    </div>`;
+  }).join('');
+}
+
+function renderFixtureDifficulty(rows, teams) {
+  const el = document.getElementById('fixture-difficulty');
+  if (!el) return;
+  
+  // Group by fixture and calculate difficulty
+  const fixtures = {};
+  rows.forEach(r => {
+    const key = `${r.club_name}-${r.opponent}`;
+    if (!fixtures[key]) {
+      fixtures[key] = {
+        home: r.club_name,
+        away: r.opponent,
+        homeId: r.club_id,
+        awayId: r.opponent_id || 'unknown',
+        difficulty: 0,
+        count: 0
+      };
+    }
+    fixtures[key].difficulty += (r.venue === 'H' ? r.clean_sheet_prob : 1 - r.clean_sheet_prob);
+    fixtures[key].count++;
+  });
+  
+  const fixtureList = Object.values(fixtures).map(f => ({
+    ...f,
+    avgDifficulty: f.difficulty / f.count
+  })).sort((a, b) => a.avgDifficulty - b.avgDifficulty); // Lower difficulty = easier
+  
+  el.innerHTML = fixtureList.slice(0, 6).map((f, i) => {
+    const homeTeam = teams[f.homeId];
+    const awayTeam = teams[f.awayId];
+    const difficultyLevel = f.avgDifficulty < 0.3 ? 'Easy' : f.avgDifficulty < 0.5 ? 'Medium' : 'Hard';
+    const difficultyColor = f.avgDifficulty < 0.3 ? 'var(--pl-green)' : f.avgDifficulty < 0.5 ? 'var(--pl-gold)' : 'var(--pl-red)';
+    
+    return `<div class="flex justify-between items-center card fpl-row" style="margin:0 0 8px; padding:12px 16px;">
+      <span class="flex items-center gap-2">
+        ${homeTeam ? crestHTML(homeTeam, 20) : ''} 
+        <span class="fpl-team-name">${f.home}</span>
+        <span class="muted fs-11">vs</span>
+        ${awayTeam ? crestHTML(awayTeam, 20) : ''} 
+        <span class="fpl-team-name">${f.away}</span>
+      </span>
+      <span class="fpl-difficulty" style="font-weight:800; color: ${difficultyColor};">${difficultyLevel}</span>
+    </div>`;
+  }).join('');
+}
+
+function exportFPLData() {
+  const gw = document.getElementById('gameweek').value || 1;
+  // Create export functionality
+  alert(`Exporting FPL data for Gameweek ${gw}... (Export functionality to be implemented)`);
+}
+
 window.addEventListener('DOMContentLoaded', load);
 </script>
 {% endblock %}

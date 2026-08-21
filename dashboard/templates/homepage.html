@@ -1,70 +1,270 @@
 {% extends "base.html" %}
 {% block title %}Matchday IQ | Premier League forecasting{% endblock %}
 {% block content %}
+<!-- Immersive Hero Section -->
 <section class="home-hero">
   <div class="home-hero__noise"></div>
+  <div class="stadium-atmosphere"></div>
   <div class="container home-hero__inner">
-    <div class="home-hero__copy">
-      <div class="matchday-strip"><span class="status-dot"></span> Matchday intelligence &nbsp; / &nbsp; 2026–27 season</div>
-      <h1>Football forecasts<br>with <i>the noise removed.</i></h1>
+    <div class="home-hero__copy animate-on-scroll">
+      <div class="matchday-strip">
+        <span class="live-indicator"><span class="live-dot"></span> MODEL ONLINE</span>
+        <span class="matchday-separator">|</span>
+        <span>SEASON 2026–27</span>
+      </div>
+      <h1 class="gradient-text">Football forecasts<br>with <i>the noise removed.</i></h1>
       <p>Go beyond a score tip. Matchday IQ turns the Dixon–Coles model, live team signals and thousands of simulated scorelines into a readable call on every match.</p>
       <div class="home-hero__actions">
-        <a class="btn btn-lime" href="{{ url_for('pages.dashboard') }}">Open match centre <span>→</span></a>
-        <a class="text-link" href="#how-it-works">See how the model thinks <span>↓</span></a>
+        <a class="btn btn-gold glow-btn" href="{{ url_for('pages.dashboard') }}">Open match centre <span>→</span></a>
+        <a class="btn btn-outline" href="#how-it-works">See how the model thinks <span>↓</span></a>
       </div>
-      <div class="trust-row"><span><b>380</b> fixtures mapped</span><span><b>20</b> clubs tracked</span><span><b>300</b> season simulations</span></div>
+      <div class="trust-row">
+        <span class="trust-item"><b>380</b> fixtures mapped</span>
+        <span class="trust-item"><b>20</b> clubs tracked</span>
+        <span class="trust-item"><b>300</b> season simulations</span>
+      </div>
     </div>
-    <div class="match-card" aria-label="Featured opening fixture forecast">
-      <div class="match-card__top"><span>Opening weekend</span><span>Fri 21 Aug · 20:00</span></div>
-      <div class="match-card__teams">
-        <div class="team-lockup team-lockup--home"><span class="club-orb club-orb--ars">ARS</span><strong>Arsenal</strong></div>
-        <div class="match-card__versus"><span>V</span><small>Emirates Stadium</small></div>
-        <div class="team-lockup"><span class="club-orb club-orb--cov">COV</span><strong>Coventry</strong></div>
+    
+    <!-- Enhanced Match Card with 3D Effect -->
+    <div class="match-card animate-on-scroll" aria-label="Featured opening fixture forecast">
+      <div class="match-card__top">
+        <span class="match-card__badge">Opening weekend</span>
+        <span class="match-card__time">Fri 21 Aug · 20:00</span>
       </div>
-      <div class="match-card__verdict"><span>MODEL VERDICT</span><strong>Home edge, but not a walkover.</strong><p>Arsenal’s home attack carries the call. The draw remains live.</p></div>
-      <div class="probability-track"><i style="width:52%"></i><b style="width:25%"></b><em style="width:23%"></em></div>
-      <div class="probability-labels"><span><b>52%</b> Home</span><span><b>25%</b> Draw</span><span><b>23%</b> Away</span></div>
-      <div class="match-card__footer"><span>Expected goals <b>1.86 — 0.98</b></span><a href="{{ url_for('pages.dashboard') }}">Full forecast →</a></div>
+      <div class="match-card__teams">
+        <div class="team-lockup team-lockup--home">
+          <span class="club-orb club-orb--ars">ARS</span>
+          <strong>Arsenal</strong>
+        </div>
+        <div class="match-card__versus">
+          <span class="versus-badge">V</span>
+          <small>Emirates Stadium</small>
+        </div>
+        <div class="team-lockup">
+          <span class="club-orb club-orb--cov">COV</span>
+          <strong>Coventry</strong>
+        </div>
+      </div>
+      <div class="match-card__verdict">
+        <span class="verdict-label">MODEL VERDICT</span>
+        <strong class="verdict-text">Home edge, but not a walkover.</strong>
+        <p class="verdict-detail">Arsenal's home attack carries the call. The draw remains live.</p>
+      </div>
+      <div class="probability-track">
+        <i style="width:52%"></i>
+        <b style="width:25%"></b>
+        <em style="width:23%"></em>
+      </div>
+      <div class="probability-labels">
+        <span><b class="team-text-ars">52%</b> Home</span>
+        <span><b>25%</b> Draw</span>
+        <span><b class="team-text-cov">23%</b> Away</span>
+      </div>
+      <div class="match-card__footer">
+        <span>Expected goals <b>1.86 — 0.98</b></span>
+        <a href="{{ url_for('pages.dashboard') }}" class="btn btn-sm">Full forecast →</a>
+      </div>
     </div>
   </div>
-  <div class="hero-scoreline">02<span>:</span>01</div>
+  
+  <!-- Animated Scoreline Background -->
+  <div class="hero-scoreline animate-pulse">02<span>:</span>01</div>
+  
+  <!-- Countdown Timer -->
+  <div class="hero-countdown">
+    <span class="countdown-label">Season opener in:</span>
+    <div class="countdown-timer" id="season-countdown">
+      <span class="countdown-unit"><strong id="days">--</strong><small>Days</small></span>
+      <span class="countdown-separator">:</span>
+      <span class="countdown-unit"><strong id="hours">--</strong><small>Hours</small></span>
+      <span class="countdown-separator">:</span>
+      <span class="countdown-unit"><strong id="minutes">--</strong><small>Mins</small></span>
+    </div>
+  </div>
 </section>
 
+<!-- Enhanced Signal Grid -->
 <section class="container signal-grid">
-  <article class="signal-card signal-card--wide"><span class="signal-icon">◒</span><div><small>Signal 01</small><h2>See the match beneath the score.</h2><p>Win, draw, loss, xG, correct scores and team strength in one focused match centre.</p></div><a href="{{ url_for('pages.dashboard') }}">Predict a fixture <span>↗</span></a></article>
-  <article class="signal-card"><span class="signal-icon">⌁</span><small>Signal 02</small><h3>Simulate the season.</h3><p>Title, top-four and relegation chances, calculated across the complete calendar.</p><a href="{{ url_for('pages.table') }}">Season projection →</a></article>
-  <article class="signal-card"><span class="signal-icon">✦</span><small>Signal 03</small><h3>Make smarter FPL calls.</h3><p>Captain scores and clean-sheet odds that put the next gameweek in context.</p><a href="{{ url_for('pages.fpl_lab') }}">Enter FPL Lab →</a></article>
+  <article class="signal-card signal-card--wide animate-on-scroll">
+    <span class="signal-icon">◒</span>
+    <div>
+      <small>Signal 01</small>
+      <h2>See the match beneath the score.</h2>
+      <p>Win, draw, loss, xG, correct scores and team strength in one focused match centre.</p>
+    </div>
+    <a href="{{ url_for('pages.dashboard') }}" class="btn btn-primary">Predict a fixture <span>↗</span></a>
+  </article>
+  <article class="signal-card animate-on-scroll">
+    <span class="signal-icon">⌁</span>
+    <small>Signal 02</small>
+    <h3>Simulate the season.</h3>
+    <p>Title, top-four and relegation chances, calculated across the complete calendar.</p>
+    <a href="{{ url_for('pages.table') }}" class="btn btn-outline">Season projection →</a>
+  </article>
+  <article class="signal-card animate-on-scroll">
+    <span class="signal-icon">✦</span>
+    <small>Signal 03</small>
+    <h3>Make smarter FPL calls.</h3>
+    <p>Captain scores and clean-sheet odds that put the next gameweek in context.</p>
+    <a href="{{ url_for('pages.fpl_lab') }}" class="btn btn-outline">Enter FPL Lab →</a>
+  </article>
 </section>
 
+<!-- Interactive Media Showcase -->
 <section class="container grid grid-2 media-showcase">
-  <article class="media-slot media-slot--wide" data-media="video" aria-label="Reserved matchday video area">
-    <span class="media-slot__play">▶</span><div><small>Matchday film / reserved video module</small><h3>Let the numbers meet the atmosphere.</h3></div>
+  <article class="media-slot media-slot--wide animate-on-scroll" data-media="video" aria-label="Matchday video experience">
+    <span class="media-slot__play">▶</span>
+    <div>
+      <small>Matchday film / interactive video module</small>
+      <h3>Let the numbers meet the atmosphere.</h3>
+      <p>Experience the model in action with our interactive matchday visualizations.</p>
+    </div>
   </article>
-  <article class="media-slot media-slot--image" data-media="image" aria-label="Reserved editorial image area">
-    <div><small>Editorial visual / reserved image module</small><h3>The story behind the forecast.</h3></div>
+  <article class="media-slot media-slot--image animate-on-scroll" data-media="image" aria-label="Editorial image module">
+    <div>
+      <small>Editorial visual / stadium atmosphere module</small>
+      <h3>The story behind the forecast.</h3>
+      <p>Deep dive into the narratives and statistics shaping our predictions.</p>
+    </div>
   </article>
 </section>
 
+<!-- Enhanced Model Explanation -->
 <section class="container match-radar-section" id="how-it-works">
   <div class="section-kicker">Inside the engine <span></span></div>
   <div class="match-radar-layout">
-    <div><h2>Built for supporters who want <i>the why</i>, not just the pick.</h2><p>The model begins with attacking and defensive strength, adds home advantage and a low-score correlation adjustment, then explores every plausible scoreline.</p><a class="btn btn-outline" href="{{ url_for('pages.settings_page') }}">Explore methodology</a></div>
-    <div class="pitch-model" aria-label="Model factors visualisation">
-      <div class="pitch-model__line pitch-model__line--half"></div><div class="pitch-model__circle"></div>
-      <div class="pitch-token pitch-token--a">Attack<br><b>38%</b></div><div class="pitch-token pitch-token--b">Defence<br><b>27%</b></div><div class="pitch-token pitch-token--c">Form<br><b>19%</b></div><div class="pitch-token pitch-token--d">Home<br><b>16%</b></div>
-      <div class="pitch-model__centre">DC<br><small>MODEL</small></div>
+    <div class="model-explanation animate-on-scroll">
+      <h2>Built for supporters who want <i>the why</i>, not just the pick.</h2>
+      <p>The model begins with attacking and defensive strength, adds home advantage and a low-score correlation adjustment, then explores every plausible scoreline.</p>
+      <div class="model-features">
+        <div class="model-feature">
+          <span class="feature-icon">📊</span>
+          <div>
+            <strong>Dixon-Coles Model</strong>
+            <small>Bivariate Poisson with low-score correlation</small>
+          </div>
+        </div>
+        <div class="model-feature">
+          <span class="feature-icon">🎲</span>
+          <div>
+            <strong>Monte Carlo Simulation</strong>
+            <small>300+ season simulations for accuracy</small>
+          </div>
+        </div>
+        <div class="model-feature">
+          <span class="feature-icon">⚡</span>
+          <div>
+            <strong>Real-time Signals</strong>
+            <small>Live team form and injury updates</small>
+          </div>
+        </div>
+      </div>
+      <a class="btn btn-outline" href="{{ url_for('pages.settings_page') }}">Explore methodology</a>
+    </div>
+    <div class="pitch-model animate-on-scroll" aria-label="Model factors visualisation">
+      <div class="pitch-model__line pitch-model__line--half"></div>
+      <div class="pitch-model__circle"></div>
+      <div class="pitch-token pitch-token--a">
+        <span class="pitch-token-label">Attack</span>
+        <span class="pitch-token-value">38%</span>
+      </div>
+      <div class="pitch-token pitch-token--b">
+        <span class="pitch-token-label">Defence</span>
+        <span class="pitch-token-value">27%</span>
+      </div>
+      <div class="pitch-token pitch-token--c">
+        <span class="pitch-token-label">Form</span>
+        <span class="pitch-token-value">19%</span>
+      </div>
+      <div class="pitch-token pitch-token--d">
+        <span class="pitch-token-label">Home</span>
+        <span class="pitch-token-value">16%</span>
+      </div>
+      <div class="pitch-model__centre">
+        <span class="pitch-model-label">DC</span>
+        <span class="pitch-model-sublabel">MODEL</span>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- Enhanced Season Preview -->
 <section class="container season-preview">
-  <div class="section-heading"><div><span class="eyebrow">Season outlook</span><h2>The race, before the first whistle.</h2></div><a class="text-link" href="{{ url_for('pages.table') }}">Run a fresh simulation →</a></div>
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">Season outlook</span>
+      <h2>The race, before the first whistle.</h2>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('pages.table') }}">Run a fresh simulation →</a>
+  </div>
   <div class="season-preview__grid">
-    <div class="podium-card"><span>01</span><div><small>Highest title signal</small><h3>Season simulation</h3><p>Each run plays every remaining fixture using the model’s scoreline distribution.</p></div><div class="podium-card__bars"><i></i><i></i><i></i><i></i></div></div>
-    <div class="season-stat"><span>Title race</span><strong>20</strong><small>clubs in the model</small></div><div class="season-stat"><span>Outcome matrix</span><strong>49</strong><small>score cells per match</small></div><div class="season-stat"><span>FPL watch</span><strong>38</strong><small>gameweeks covered</small></div>
+    <div class="podium-card animate-on-scroll">
+      <span class="podium-number">01</span>
+      <div>
+        <small>Highest title signal</small>
+        <h3>Season simulation</h3>
+        <p>Each run plays every remaining fixture using the model's scoreline distribution.</p>
+      </div>
+      <div class="podium-card__bars">
+        <i></i><i></i><i></i><i></i>
+      </div>
+    </div>
+    <div class="season-stat animate-on-scroll">
+      <span class="stat-label">Title race</span>
+      <strong class="stat-value">20</strong>
+      <small class="stat-sub">clubs in the model</small>
+    </div>
+    <div class="season-stat animate-on-scroll">
+      <span class="stat-label">Outcome matrix</span>
+      <strong class="stat-value">49</strong>
+      <small class="stat-sub">score cells per match</small>
+    </div>
+    <div class="season-stat animate-on-scroll">
+      <span class="stat-label">FPL watch</span>
+      <strong class="stat-value">38</strong>
+      <small class="stat-sub">gameweeks covered</small>
+    </div>
   </div>
 </section>
 
-<section class="container final-cta"><span class="eyebrow">Your matchday starts here</span><h2>Trust the process.<br><i>Challenge the call.</i></h2><p>Forecast the next fixture, interrogate the numbers, and make the match your own.</p><a class="btn btn-lime" href="{{ url_for('pages.dashboard') }}">Make a prediction →</a></section>
+<!-- Enhanced Final CTA -->
+<section class="container final-cta">
+  <span class="eyebrow">Your matchday starts here</span>
+  <h2>Trust the process.<br><i>Challenge the call.</i></h2>
+  <p>Forecast the next fixture, interrogate the numbers, and make the match your own.</p>
+  <div class="cta-buttons">
+    <a class="btn btn-gold glow-btn" href="{{ url_for('pages.dashboard') }}">Make a prediction →</a>
+    <a class="btn btn-outline" href="{{ url_for('pages.table') }}">Simulate season →</a>
+  </div>
+</section>
 {% endblock %}
-{% block scripts %}<script src="{{ url_for('static', filename='experience.js') }}"></script>{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='experience.js') }}"></script>
+<script src="{{ url_for('static', filename='animations.js') }}"></script>
+<script>
+// Countdown Timer
+const KICKOFF = new Date("{{ kickoff }}");
+function updateCountdown() {
+  const diff = Math.max(0, KICKOFF - new Date());
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const minutes = Math.floor((diff % 3600000) / 60000);
+  
+  document.getElementById('days').textContent = days;
+  document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+  document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+}
+setInterval(updateCountdown, 60000);
+updateCountdown();
+
+// Initialize animations
+document.addEventListener('DOMContentLoaded', () => {
+  // Trigger hero animations
+  const heroElements = document.querySelectorAll('.home-hero__copy > *');
+  heroElements.forEach((el, index) => {
+    el.style.opacity = '0';
+    el.style.animation = `fadeInUp 0.6s ease forwards ${index * 0.1}s`;
+  });
+});
+</script>
+{% endblock %}

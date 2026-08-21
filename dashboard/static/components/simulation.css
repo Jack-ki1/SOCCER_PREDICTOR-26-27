@@ -1,0 +1,650 @@
+/* 
+ * Simulation Components
+ * Styling for season simulation visualization and Monte Carlo displays
+ */
+
+/* Simulation Container */
+.simulation-container {
+  background: var(--gradient-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 20px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.simulation-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--pl-purple), var(--pl-gold), var(--pl-green));
+}
+
+/* Simulation Header */
+.simulation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.simulation-title {
+  font-size: 24px;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--text);
+}
+
+.simulation-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.simulation-count-input {
+  width: 80px;
+  padding: 8px 12px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  text-align: center;
+}
+
+/* Simulation Progress */
+.simulation-progress {
+  margin: 20px 0;
+  padding: 16px;
+  background: var(--surface-alt);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.simulation-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.simulation-progress-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.simulation-progress-percentage {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  color: var(--pl-gold);
+}
+
+.simulation-progress-bar {
+  height: 8px;
+  background: var(--surface);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.simulation-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--pl-purple), var(--pl-gold));
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.simulation-progress-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.simulation-progress-detail {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.simulation-progress-detail strong {
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+}
+
+/* Live Table Updates */
+.live-table-container {
+  margin: 20px 0;
+  background: var(--surface-alt);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.live-table-header {
+  padding: 12px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.live-table-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.live-table-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--pl-green);
+}
+
+.live-table-indicator::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--pl-green);
+  border-radius: 50%;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.live-table-content {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.live-table-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  transition: background var(--transition-normal);
+}
+
+.live-table-row:hover {
+  background: var(--surface);
+}
+
+.live-table-position {
+  width: 32px;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  color: var(--text-muted);
+}
+
+.live-table-team {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.live-table-points {
+  width: 60px;
+  text-align: right;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  color: var(--pl-gold);
+}
+
+/* Championship Race Visualization */
+.championship-race {
+  margin: 24px 0;
+}
+
+.championship-race-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.championship-race-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.championship-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.championship-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.championship-team {
+  width: 120px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.championship-bar-wrapper {
+  flex: 1;
+  height: 24px;
+  background: var(--surface-alt);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  border: 1px solid var(--border);
+}
+
+.championship-bar {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  transition: width 0.8s ease;
+}
+
+.championship-bar--title {
+  background: linear-gradient(90deg, var(--pl-gold), var(--pl-gold-dark));
+}
+
+.championship-bar--top4 {
+  background: linear-gradient(90deg, var(--pl-green), var(--pl-green-dark));
+}
+
+.championship-bar--other {
+  background: var(--text-muted);
+}
+
+.championship-probability {
+  width: 60px;
+  text-align: right;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+}
+
+/* Relegation Battle */
+.relegation-battle {
+  margin: 24px 0;
+  padding: 16px;
+  background: rgba(255, 51, 51, 0.1);
+  border: 1px solid rgba(255, 51, 51, 0.3);
+  border-radius: 8px;
+}
+
+.relegation-battle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.relegation-battle-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pl-red);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.relegation-battle-title::before {
+  content: '⚠';
+  font-size: 16px;
+}
+
+.relegation-teams {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.relegation-team-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--surface-alt);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.relegation-team-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.relegation-team-name {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.relegation-probability-bar {
+  width: 120px;
+  height: 8px;
+  background: var(--surface);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.relegation-probability-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--pl-red), #cc0000);
+  border-radius: 4px;
+  transition: width 0.8s ease;
+}
+
+.relegation-probability-value {
+  width: 50px;
+  text-align: right;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--pl-red);
+}
+
+/* European Qualification */
+.european-qualification {
+  margin: 24px 0;
+}
+
+.european-qualification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.european-qualification-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pl-blue);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.european-qualification-title::before {
+  content: '⭐';
+  font-size: 16px;
+}
+
+.european-spots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.european-spot-card {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.european-spot-competition {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.european-spot-teams {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.european-spot-team {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.european-spot-probability {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+/* Scenario Comparison */
+.scenario-comparison {
+  margin: 24px 0;
+}
+
+.scenario-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+
+.scenario-tab {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.scenario-tab:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.scenario-tab.active {
+  background: var(--pl-purple);
+  color: white;
+}
+
+.scenario-content {
+  display: none;
+}
+
+.scenario-content.active {
+  display: block;
+}
+
+/* Form Trajectory */
+.form-trajectory {
+  margin: 24px 0;
+}
+
+.form-trajectory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.form-trajectory-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.form-trajectory-chart {
+  height: 150px;
+  background: var(--surface-alt);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 16px;
+  position: relative;
+}
+
+/* Final Table Display */
+.final-table {
+  margin: 24px 0;
+  background: var(--surface-alt);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.final-table-header {
+  padding: 12px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.final-table-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.final-table-stats {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.final-table-stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.final-table-stat strong {
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+}
+
+.final-table-content {
+  overflow-x: auto;
+}
+
+.final-table-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition-normal);
+}
+
+.final-table-row:hover {
+  background: var(--surface);
+}
+
+.final-table-row:last-child {
+  border-bottom: none;
+}
+
+.final-table-position {
+  width: 40px;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  color: var(--text-muted);
+}
+
+.final-table-position--champions-league {
+  color: var(--pl-blue);
+}
+
+.final-table-position--europa-league {
+  color: var(--pl-orange);
+}
+
+.final-table-position--relegation {
+  color: var(--pl-red);
+}
+
+.final-table-team {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.final-table-probabilities {
+  display: flex;
+  gap: 16px;
+}
+
+.final-table-probability {
+  width: 60px;
+  text-align: right;
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+}
+
+.final-table-probability--title {
+  color: var(--pl-gold);
+}
+
+.final-table-probability--top4 {
+  color: var(--pl-green);
+}
+
+.final-table-probability--relegation {
+  color: var(--pl-red);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .simulation-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .simulation-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .championship-bar-container {
+    flex-wrap: wrap;
+  }
+  
+  .championship-team {
+    width: 80px;
+  }
+  
+  .european-spots {
+    grid-template-columns: 1fr;
+  }
+  
+  .final-table-probabilities {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .final-table-row {
+    flex-wrap: wrap;
+  }
+}

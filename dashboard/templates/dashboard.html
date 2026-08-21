@@ -2,18 +2,30 @@
 {% block title %}Dashboard — EPL Predictor{% endblock %}
 {% block content %}
 <div class="container">
-  <div class="grid grid-2">
-    <div class="card">
+  <!-- Enhanced Dashboard Hero -->
+  <div class="dashboard-hero animate-on-scroll">
+    <div class="hero-content">
       <span class="pill pill-lime">Pre-season model</span>
-      <h1 style="font-size:30px; margin:12px 0 8px;">Kick-off in <span id="countdown" style="color:var(--purple);">—</span></h1>
+      <h1 style="font-size: clamp(2rem, 5vw, 3.5rem); margin: 16px 0 8px;">Kick-off in <span id="countdown" class="gradient-text">—</span></h1>
       <p class="sub fs-12">Season opener: <b style="color:var(--text);">Arsenal vs Coventry City</b>, Emirates Stadium — Friday 21 August 2026.</p>
+      
       <div class="grid grid-3 mt-3">
-        <div class="card" style="margin:0;"><div class="fs-12" style="font-weight:800;">20</div><div class="muted fs-11">Clubs</div></div>
-        <div class="card" style="margin:0;"><div class="fs-12" style="font-weight:800; color:var(--purple);">380</div><div class="muted fs-11">Fixtures modelled</div></div>
-        <div class="card" style="margin:0;"><div class="fs-12" style="font-weight:800; color:var(--lime);">3</div><div class="muted fs-11">Promoted sides</div></div>
+        <div class="card card-premium" style="margin:0;">
+          <div class="fs-12" style="font-weight:800;">20</div>
+          <div class="muted fs-11">Clubs</div>
+        </div>
+        <div class="card card-premium" style="margin:0;">
+          <div class="fs-12" style="font-weight:800; color:var(--pl-purple);">380</div>
+          <div class="muted fs-11">Fixtures modelled</div>
+        </div>
+        <div class="card card-premium" style="margin:0;">
+          <div class="fs-12" style="font-weight:800; color:var(--pl-green);">3</div>
+          <div class="muted fs-11">Promoted sides</div>
+        </div>
       </div>
     </div>
-
+    
+    <!-- Enhanced Teletext Ticker -->
     <div class="teletext">
       <div class="teletext-head">
         <span class="fs-11" style="color:#FFD23F; font-weight:800; font-family:monospace;">P445 CEEFAX FOOTBALL</span>
@@ -25,59 +37,216 @@
     </div>
   </div>
 
-  <div class="data-ribbon" aria-label="Model coverage"><div><span>Next signal</span><b>2.7 hrs</b><small class="muted fs-10">to model refresh</small></div><div><span>Confidence band</span><b>72%</b><small class="muted fs-10">current calibration</small></div><div><span>Goals mapped</span><b>18.6k</b><small class="muted fs-10">scorelines solved</small></div><div><span>Engine state</span><b style="color:#75b900">LIVE</b><small class="muted fs-10">Dixon–Coles online</small></div></div>
-  <div class="insight-strip"><article><small>01 / read the edge</small><h3>Home advantage is a signal, not a guarantee.</h3><p>The model separates venue effect from underlying team strength before it makes a call.</p></article><article><small>02 / read the shape</small><h3>Low scores get special treatment.</h3><p>Our correlation adjustment protects the 0–0, 1–0 and 1–1 cells from naive Poisson assumptions.</p></article><article><small>03 / read the season</small><h3>One game never tells the whole story.</h3><p>Jump to Season for the thousands of outcomes behind the table projection.</p></article></div>
-  <div class="image-slot mt-4" style="height:110px;">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 16l-5.5-5.5L9 17"/></svg>
-    Matchday photo — drop in a stadium / crowd shot
+  <!-- Enhanced Data Ribbon -->
+  <div class="data-ribbon" aria-label="Model coverage">
+    <div><span>Next signal</span><b>2.7 hrs</b><small class="muted fs-10">to model refresh</small></div>
+    <div><span>Confidence band</span><b>72%</b><small class="muted fs-10">current calibration</small></div>
+    <div><span>Goals mapped</span><b>18.6k</b><small class="muted fs-10">scorelines solved</small></div>
+    <div><span>Engine state</span><b style="color:#75b900">LIVE</b><small class="muted fs-10">Dixon–Coles online</small></div>
+  </div>
+  
+  <!-- Enhanced Insight Strip -->
+  <div class="insight-strip">
+    <article class="insight-card animate-on-scroll">
+      <small>01 / read the edge</small>
+      <h3>Home advantage is a signal, not a guarantee.</h3>
+      <p>The model separates venue effect from underlying team strength before it makes a call.</p>
+    </article>
+    <article class="insight-card animate-on-scroll">
+      <small>02 / read the shape</small>
+      <h3>Low scores get special treatment.</h3>
+      <p>Our correlation adjustment protects the 0–0, 1–0 and 1–1 cells from naive Poisson assumptions.</p>
+    </article>
+    <article class="insight-card animate-on-scroll">
+      <small>03 / read the season</small>
+      <h3>One game never tells the whole story.</h3>
+      <p>Jump to Season for the thousands of outcomes behind the table projection.</p>
+    </article>
+  </div>
+  
+  <!-- Enhanced Image Slot -->
+  <div class="image-slot mt-4" style="height:140px;">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 16l-5.5-5.5L9 17"/></svg>
+    <div>Matchday atmosphere — stadium/crowd visual placeholder</div>
   </div>
 
+  <!-- Enhanced Fixture Selection -->
   <div class="card mt-4">
-    <h3 style="margin-top:0;">Pick a fixture</h3>
-    <div class="flex gap-2" style="flex-wrap:wrap;" id="fixture-picker">
+    <div class="section-heading">
+      <h3 style="margin:0;">Pick a fixture</h3>
+      <div class="fixture-filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="fav">Favorites</button>
+        <button class="filter-btn" data-filter="big6">Big Six</button>
+      </div>
+    </div>
+    
+    <!-- Matchweek Selector -->
+    <div class="matchweek-selector mt-3">
+      <button class="matchweek-btn current">GW 1</button>
+      <button class="matchweek-btn">GW 2</button>
+      <button class="matchweek-btn">GW 3</button>
+      <button class="matchweek-btn">GW 4</button>
+      <button class="matchweek-btn">GW 5</button>
+    </div>
+    
+    <!-- Enhanced Fixture Wall -->
+    <div class="fixture-wall mt-3" id="fixture-picker">
       {% for f in mw1 %}
-      <button class="btn btn-outline fs-11" data-home="{{ f.home_id }}" data-away="{{ f.away_id }}" onclick="selectFixture(this)">
-        {{ f.home_name }} vs {{ f.away_name }}
-      </button>
+      <div class="fixture-card animate-on-scroll" data-home="{{ f.home_id }}" data-away="{{ f.away_id }}" data-fixture-id="{{ f.home_id }}-{{ f.away_id }}" onclick="selectFixture(this)">
+        <button class="favorite-btn" title="Add to favorites">★</button>
+        <div class="fixture-header">
+          <span class="fixture-competition">Premier League</span>
+          <span class="fixture-kickoff">15:00</span>
+        </div>
+        <div class="fixture-teams">
+          <div class="fixture-team fixture-team--home">
+            <span class="fixture-crest" style="background: #{{ f.home_color if f.home_color else '6b21a8' }};">{{ f.home_name[:3].upper() }}</span>
+            <span class="fixture-team-name">{{ f.home_name }}</span>
+          </div>
+          <div class="fixture-versus">
+            <span class="fixture-versus-badge">V</span>
+            <span class="fixture-venue">{{ f.venue if f.venue else 'Home Stadium' }}</span>
+          </div>
+          <div class="fixture-team fixture-team--away">
+            <span class="fixture-crest" style="background: #{{ f.away_color if f.away_color else '6b21a8' }};">{{ f.away_name[:3].upper() }}</span>
+            <span class="fixture-team-name">{{ f.away_name }}</span>
+          </div>
+        </div>
+        <div class="fixture-form">
+          <div class="form-result form-result--win">W</div>
+          <div class="form-result form-result--draw">D</div>
+          <div class="form-result form-result--win">W</div>
+          <div class="form-result form-result--loss">L</div>
+          <div class="form-result form-result--win">W</div>
+        </div>
+        <div class="fixture-stats">
+          <div class="fixture-stat">
+            <span class="fixture-stat-label">Home Win</span>
+            <span class="fixture-stat-value">52%</span>
+          </div>
+          <div class="fixture-stat">
+            <span class="fixture-stat-label">Draw</span>
+            <span class="fixture-stat-value">25%</span>
+          </div>
+          <div class="fixture-stat">
+            <span class="fixture-stat-label">Away Win</span>
+            <span class="fixture-stat-value">23%</span>
+          </div>
+        </div>
+      </div>
       {% endfor %}
     </div>
   </div>
 
-  <div class="card mt-3" id="pre-run-card" style="text-align:center;">
+  <!-- Enhanced Pre-run Card -->
+  <div class="card mt-3 card-premium" id="pre-run-card" style="text-align:center;">
     <p class="sub fs-12">Ready when you are — run the model to see the 1X2, xG, correct-score grid and radar for this fixture.</p>
-    <button class="btn btn-lime glow-btn" onclick="runPrediction()">Run Prediction</button>
+    <button class="btn btn-gold glow-btn" onclick="runPrediction()">Run Prediction</button>
   </div>
   <div id="run-loader" style="display:none;" class="mt-3"></div>
 
-  <div class="card mt-3 pop-in" id="prediction-card" style="display:none;">
-    <div class="flex justify-between items-center mb-3">
+  <!-- Enhanced Prediction Card -->
+  <div class="card mt-3 prediction-container pop-in" id="prediction-card" style="display:none;">
+    <div class="prediction-header">
       <h3 id="pred-title" style="margin:0;"></h3>
-      <span class="pill" id="favours-pill"></span>
+      <span class="prediction-badge" id="favours-pill"></span>
     </div>
-    <div id="prob-bar-wrap"></div>
-    <div class="flex justify-between fs-11 mt-2 mb-3">
-      <span id="p-home"></span><span id="p-draw"></span><span id="p-away"></span>
+    
+    <!-- Enhanced Probability Bar -->
+    <div class="probability-bar-container">
+      <div class="probability-bar">
+        <div class="probability-segment probability-segment--home" id="prob-home-seg"></div>
+        <div class="probability-segment probability-segment--draw" id="prob-draw-seg"></div>
+        <div class="probability-segment probability-segment--away" id="prob-away-seg"></div>
+      </div>
+      <div class="probability-labels">
+        <span id="p-home"></span>
+        <span id="p-draw"></span>
+        <span id="p-away"></span>
+      </div>
     </div>
-    <div class="grid grid-4 mb-3">
-      <div class="card" style="margin:0;"><div class="muted fs-11">xG HOME</div><div id="xg-home" style="font-size:20px; font-weight:800;"></div></div>
-      <div class="card" style="margin:0;"><div class="muted fs-11">xG AWAY</div><div id="xg-away" style="font-size:20px; font-weight:800;"></div></div>
-      <div class="card" style="margin:0;"><div class="muted fs-11">BTTS YES</div><div id="btts" style="font-size:20px; font-weight:800;"></div></div>
-      <div class="card" style="margin:0;"><div class="muted fs-11">OVER 2.5</div><div id="over25" style="font-size:20px; font-weight:800;"></div></div>
+    
+    <!-- Enhanced Stats Grid -->
+    <div class="stats-grid mt-3">
+      <div class="stat-card">
+        <div class="stat-label">xG HOME</div>
+        <div id="xg-home" class="stat-value stat-value--highlight"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">xG AWAY</div>
+        <div id="xg-away" class="stat-value stat-value--highlight"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">BTTS YES</div>
+        <div id="btts" class="stat-value stat-value--positive"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">OVER 2.5</div>
+        <div id="over25" class="stat-value stat-value--positive"></div>
+      </div>
     </div>
 
-    <div class="grid grid-2">
+    <div class="grid grid-2 mt-3">
+      <!-- Enhanced Score Grid -->
       <div>
         <h4 class="mb-2">Correct score probability grid</h4>
-        <div id="score-grid"></div>
+        <div class="score-grid-container">
+          <div class="score-grid-header">
+            <span class="score-grid-title">Score Probability Matrix</span>
+            <div class="score-grid-legend">
+              <span class="score-grid-legend-item">
+                <span class="score-grid-legend-color" style="background: var(--pl-green);"></span>
+                High
+              </span>
+              <span class="score-grid-legend-item">
+                <span class="score-grid-legend-color" style="background: var(--pl-gold);"></span>
+                Medium
+              </span>
+              <span class="score-grid-legend-item">
+                <span class="score-grid-legend-color" style="background: var(--pl-purple);"></span>
+                Low
+              </span>
+            </div>
+          </div>
+          <div id="score-grid"></div>
+        </div>
       </div>
+      
+      <!-- Enhanced Goal Distribution -->
       <div>
         <h4 class="mb-2">Goal distribution</h4>
-        <canvas id="goal-dist-chart" height="180"></canvas>
+        <div class="goal-distribution-container">
+          <div class="chart-container">
+            <canvas id="goal-dist-chart" height="180"></canvas>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- Enhanced Team Strength Comparison -->
     <h4 class="mt-4 mb-2">Team strength comparison</h4>
-    <div style="max-width:420px; margin:0 auto;"><canvas id="radar-chart"></canvas></div>
+    <div class="strength-comparison">
+      <div class="strength-bars" id="strength-bars"></div>
+    </div>
+    <div style="max-width:420px; margin:16px auto 0;"><canvas id="radar-chart"></canvas></div>
+
+    <!-- Enhanced Confidence Meter -->
+    <div class="confidence-meter mt-3">
+      <div class="confidence-header">
+        <span class="confidence-title">Model Confidence</span>
+        <span class="confidence-level" id="confidence-level">--</span>
+      </div>
+      <div class="confidence-bar">
+        <div class="confidence-fill" id="confidence-fill"></div>
+      </div>
+    </div>
+
+    <!-- Enhanced Prediction Insights -->
+    <div class="prediction-insights mt-3">
+      <div class="insight-title">🧠 Key Factors</div>
+      <div class="insight-list" id="prediction-insights"></div>
+    </div>
 
     <div class="card mt-3" style="margin-bottom:0; background:var(--surface-alt);">
       <span class="fs-11 sub">Dixon-Coles bivariate Poisson model with a low-score correlation adjustment (rho) and Monte Carlo-derived season context — tune rho, home-advantage weight, and form weight on the Settings page.</span>
@@ -87,6 +256,7 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename='dashboard-experience.js') }}"></script>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
 <script>
 const KICKOFF = new Date("{{ kickoff }}");
 function tickCountdown() {
@@ -98,16 +268,32 @@ setInterval(tickCountdown, 30000); tickCountdown();
 
 let currentFixture = null;
 
-async function selectFixture(btn) {
-  currentFixture = { home: btn.dataset.home, away: btn.dataset.away };
-  document.querySelectorAll('#fixture-picker button').forEach(b => { b.classList.remove('btn'); b.classList.add('btn-outline'); });
-  btn.classList.remove('btn-outline'); btn.classList.add('btn');
+async function selectFixture(card) {
+  currentFixture = { 
+    home: card.dataset.home, 
+    away: card.dataset.away,
+    fixtureId: card.dataset.fixtureId 
+  };
+  
+  document.querySelectorAll('#fixture-picker .fixture-card').forEach(c => { 
+    c.classList.remove('selected'); 
+  });
+  card.classList.add('selected');
+  
   document.getElementById('prediction-card').style.display = 'none';
   document.getElementById('pre-run-card').style.display = 'block';
 }
 
 async function runPrediction() {
-  if (!currentFixture) currentFixture = { home: '{{ mw1[0].home_id }}', away: '{{ mw1[0].away_id }}' };
+  if (!currentFixture) {
+    const firstCard = document.querySelector('#fixture-picker .fixture-card');
+    if (firstCard) {
+      selectFixture(firstCard);
+    } else {
+      currentFixture = { home: '{{ mw1[0].home_id }}', away: '{{ mw1[0].away_id }}' };
+    }
+  }
+  
   document.getElementById('pre-run-card').style.display = 'none';
   const steps = ['Pulling squad ratings...', 'Modelling expected goals (Dixon-Coles)...', 'Solving the 49-cell scoreline matrix...', 'Final whistle -- here is the call...'];
   runStagedLoader('run-loader', steps, 320, async () => {
@@ -123,13 +309,21 @@ async function showPrediction(home, away) {
 
   document.getElementById('prediction-card').style.display = 'block';
   document.getElementById('pred-title').innerHTML = crestHTML(homeTeam,32) + ' ' + homeTeam.short + ' <span class="muted">vs</span> ' + awayTeam.short + ' ' + crestHTML(awayTeam,32);
+  
   const favoured = p.p_home > p.p_away && p.p_home > p.p_draw ? homeTeam.name : p.p_away > p.p_home && p.p_away > p.p_draw ? awayTeam.name : null;
-  document.getElementById('favours-pill').textContent = favoured ? ('Model favours ' + favoured) : 'Too close to call';
+  const pill = document.getElementById('favours-pill');
+  pill.textContent = favoured ? `Model favours ${favoured}` : 'Too close to call';
+  pill.className = `prediction-badge ${favoured ? 'prediction-badge--favored' : 'prediction-badge--uncertain'}`;
 
-  document.getElementById('prob-bar-wrap').innerHTML = probBarHTML(p.p_home, p.p_draw, p.p_away, homeTeam.color, awayTeam.color);
-  document.getElementById('p-home').innerHTML = '<b style="color:' + homeTeam.color + '">' + pct(p.p_home) + ' HOME</b>';
-  document.getElementById('p-draw').textContent = pct(p.p_draw) + ' DRAW';
-  document.getElementById('p-away').innerHTML = '<b style="color:' + awayTeam.color + '">' + pct(p.p_away) + ' AWAY</b>';
+  // Enhanced probability bar
+  document.getElementById('prob-home-seg').style.width = `${p.p_home * 100}%`;
+  document.getElementById('prob-draw-seg').style.width = `${p.p_draw * 100}%`;
+  document.getElementById('prob-away-seg').style.width = `${p.p_away * 100}%`;
+  
+  document.getElementById('p-home').innerHTML = `<b style="color:${homeTeam.color}">${pct(p.p_home)} HOME</b>`;
+  document.getElementById('p-draw').textContent = `${pct(p.p_draw)} DRAW`;
+  document.getElementById('p-away').innerHTML = `<b style="color:${awayTeam.color}">${pct(p.p_away)} AWAY</b>`;
+  
   document.getElementById('xg-home').textContent = p.lambda_home.toFixed(2);
   document.getElementById('xg-away').textContent = p.lambda_away.toFixed(2);
   document.getElementById('btts').textContent = pct(p.p_btts);
@@ -138,87 +332,124 @@ async function showPrediction(home, away) {
   renderScoreGrid(p.grid);
   renderGoalDistChart(p.grid, homeTeam, awayTeam);
   renderRadarChart(homeTeam, awayTeam);
+  renderStrengthBars(homeTeam, awayTeam);
+  renderConfidenceMeter(p);
+  renderPredictionInsights(p, homeTeam, awayTeam);
 }
 
 function renderScoreGrid(grid) {
   const max = Math.max(...grid.flat());
-  let html = '<div style="display:grid; grid-template-columns:32px repeat(6,1fr); gap:3px;">';
-  html += '<div></div>' + [0,1,2,3,4,5].map(y => '<div class="fs-11 sub" style="text-align:center;">' + (y===5?'5+':y) + '</div>').join('');
-  for (let x = 0; x <= 5; x++) {
-    html += '<div class="fs-11 sub" style="display:flex; align-items:center;">' + (x===5?'5+':x) + '</div>';
-    for (let y = 0; y <= 5; y++) {
-      let p = (x===5||y===5) ? sumTail(grid,x,y) : grid[x][y];
-      const intensity = Math.min(1, p / max);
-      html += '<div class="score-grid-cell" style="background:rgba(180,125,224,' + (0.1+intensity*0.7) + '); color:' + (intensity>0.5?'#fff':'var(--text)') + ';">' + (p*100).toFixed(0) + '</div>';
+  const container = document.getElementById('score-grid');
+  
+  let html = '<div class="score-grid">';
+  // Header row
+  html += '<div class="score-grid-header-cell"></div>';
+  for (let away = 0; away <= 6; away++) {
+    html += `<div class="score-grid-header-cell">${away}</div>`;
+  }
+  
+  // Grid rows
+  for (let home = 0; home <= 6; home++) {
+    html += `<div class="score-grid-row-label">${home}</div>`;
+    for (let away = 0; away <= 6; away++) {
+      const prob = grid[home][away];
+      const intensity = prob / max;
+      let cellClass = 'score-grid-cell--low';
+      if (intensity > 0.7) cellClass = 'score-grid-cell--high';
+      else if (intensity > 0.4) cellClass = 'score-grid-cell--medium';
+      
+      html += `<div class="score-grid-cell ${cellClass}" 
+                  data-home-score="${home}" 
+                  data-away-score="${away}" 
+                  data-probability="${prob}"
+                  style="opacity: ${0.3 + intensity * 0.7};">
+                ${(prob * 100).toFixed(1)}%
+              </div>`;
     }
   }
   html += '</div>';
-  document.getElementById('score-grid').innerHTML = html;
-}
-function sumTail(grid, x, y) {
-  const xs = x === 5 ? [5,6] : [x], ys = y === 5 ? [5,6] : [y];
-  let s = 0;
-  xs.forEach(xi => ys.forEach(yi => { s += grid[xi][yi]; }));
-  return s;
+  container.innerHTML = html;
 }
 
-let goalChart = null, radarChartInstance = null;
-function renderGoalDistChart(grid, home, away) {
-  applyChartDefaults();
-  const homeDist = grid.map(row => row.reduce((a,b) => a+b, 0));
-  const awayDist = grid[0].map((_, y) => grid.reduce((s,row) => s+row[y], 0));
-  const labels = ['0','1','2','3','4','5+'];
-  const ctx = document.getElementById('goal-dist-chart');
-  if (goalChart) goalChart.destroy();
-  goalChart = new Chart(ctx, {
-    type: 'bar',
-    data: { labels: labels, datasets: [
-      { label: home.short, data: homeDist.map(v=>v*100), backgroundColor: home.color },
-      { label: away.short, data: awayDist.map(v=>v*100), backgroundColor: away.color },
-    ]},
-    options: { responsive: true, plugins: { legend: { labels: { boxWidth: 10 } } }, scales: { y: { ticks: { callback: v => v+'%' } } } },
-  });
+function renderStrengthBars(homeTeam, awayTeam) {
+  const container = document.getElementById('strength-bars');
+  const factors = [
+    { name: 'Attack', home: homeTeam.attack, away: awayTeam.attack },
+    { name: 'Defense', home: homeTeam.defense, away: awayTeam.defense },
+    { name: 'Form', home: homeTeam.form ? homeTeam.form.filter(f => f === 'W').length * 20 : 50, 
+           away: awayTeam.form ? awayTeam.form.filter(f => f === 'W').length * 20 : 50 },
+    { name: 'Home Edge', home: homeTeam.home_adv, away: awayTeam.home_adv * 0.7 }
+  ];
+
+  container.innerHTML = factors.map(factor => {
+    const total = factor.home + factor.away;
+    const homePercent = (factor.home / total) * 100;
+    const awayPercent = (factor.away / total) * 100;
+    
+    return `
+      <div class="strength-bar-container">
+        <div class="strength-bar-label">${factor.name}</div>
+        <div class="strength-bar-wrapper">
+          <div class="strength-bar strength-bar--home" style="width: ${homePercent}%; background: ${homeTeam.color};">
+            ${factor.home}
+          </div>
+          <div class="strength-bar strength-bar--away" style="width: ${awayPercent}%; background: ${awayTeam.color};">
+            ${factor.away}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
-function renderRadarChart(home, away) {
-  applyChartDefaults();
-  const formScore = t => t.form ? t.form.reduce((s,r)=> s + (r==='W'?20:r==='D'?7:0), 0) : 50;
-  const ctx = document.getElementById('radar-chart');
-  if (radarChartInstance) radarChartInstance.destroy();
-  radarChartInstance = new Chart(ctx, {
-    type: 'radar',
-    data: {
-      labels: ['Attack','Defence','Home Edge','Discipline','Form'],
-      datasets: [
-        { label: home.short, data: [home.attack,home.defense,home.home_adv,home.discipline,formScore(home)], borderColor: home.color, backgroundColor: home.color+'44' },
-        { label: away.short, data: [away.attack,away.defense,away.home_adv,away.discipline,formScore(away)], borderColor: away.color, backgroundColor: away.color+'44' },
-      ],
-    },
-    options: { responsive: true, maintainAspectRatio: true, aspectRatio: 1.1, scales: { r: { min:0, max:100, ticks: { display:false } } } },
-  });
+function renderConfidenceMeter(prediction) {
+  const confidence = Math.max(prediction.p_home, prediction.p_draw, prediction.p_away);
+  const confidencePercent = confidence * 100;
+  
+  let levelClass = 'confidence-level--low';
+  let fillClass = 'confidence-fill--low';
+  
+  if (confidencePercent > 60) {
+    levelClass = 'confidence-level--high';
+    fillClass = 'confidence-fill--high';
+  } else if (confidencePercent > 45) {
+    levelClass = 'confidence-level--medium';
+    fillClass = 'confidence-fill--medium';
+  }
+  
+  document.getElementById('confidence-level').textContent = `${confidencePercent.toFixed(0)}%`;
+  document.getElementById('confidence-level').className = `confidence-level ${levelClass}`;
+  
+  const fill = document.getElementById('confidence-fill');
+  fill.style.width = `${confidencePercent}%`;
+  fill.className = `confidence-fill ${fillClass}`;
 }
 
-async function loadTicker() {
-  const teams = await getTeams();
-  const fixtures = {{ mw1 | tojson }};
-  const rows = await Promise.all(fixtures.map(f => apiGet('/predict/' + f.home_id + '/' + f.away_id)));
-  const body = document.getElementById('ticker-body');
-  body.innerHTML += fixtures.map((f, i) => {
-    const p = rows[i];
-    const pick = p.p_home > p.p_away && p.p_home > p.p_draw ? '1' : p.p_away > p.p_home && p.p_away > p.p_draw ? '2' : 'X';
-    const conf = Math.max(p.p_home, p.p_draw, p.p_away);
-    return '<div class="teletext-row">' +
-      '<span style="color:#39FF6A;">' + f.home_name + '</span>' +
-      '<span style="color:#fff;">' + p.top_scorelines[0][0] + '</span>' +
-      '<span style="color:#4FD8FF;">' + f.away_name + '</span>' +
-      '<span style="color:#FFD23F;">' + pct(conf) + ' ' + pick + '</span></div>';
-  }).join('') + '<div class="fs-9 tt-cursor mt-2" style="color:#4FD8FF;">NEXT PAGE 446: FULL TABLE</div>';
-}
+function renderPredictionInsights(prediction, homeTeam, awayTeam) {
+  const insights = [];
+  
+  if (prediction.p_home > 0.5) {
+    insights.push(`Strong home advantage for ${homeTeam.name} with ${(prediction.p_home * 100).toFixed(0)}% win probability`);
+  } else if (prediction.p_away > 0.4) {
+    insights.push(`${awayTeam.name} has credible away chance at ${(prediction.p_away * 100).toFixed(0)}%`);
+  }
+  
+  if (prediction.p_btts > 0.6) {
+    insights.push('Both teams likely to score (BTTS: ' + pct(prediction.p_btts) + ')');
+  }
+  
+  if (prediction.p_over_2_5 > 0.55) {
+    insights.push('High-scoring match expected (Over 2.5: ' + pct(prediction.p_over_2_5) + ')');
+  }
+  
+  const xgDiff = Math.abs(prediction.lambda_home - prediction.lambda_away);
+  if (xgDiff > 0.5) {
+    insights.push(`Expected goals difference of ${xgDiff.toFixed(2)} suggests ${prediction.lambda_home > prediction.lambda_away ? homeTeam.name : awayTeam.name} dominance`);
+  }
 
-window.addEventListener('DOMContentLoaded', () => {
-  const first = document.querySelector('#fixture-picker button');
-  if (first) selectFixture(first);
-  loadTicker();
-});
+  document.getElementById('prediction-insights').innerHTML = insights.map(insight => 
+    `<div class="insight-item">${insight}</div>`
+  ).join('');
+}
 </script>
 {% endblock %}

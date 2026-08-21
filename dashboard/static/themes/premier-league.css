@@ -1,0 +1,413 @@
+/* 
+ * Premier League Theme System
+ * Authentic broadcast-quality aesthetics for EPL Predictor
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=Oswald:wght@500;600;700&display=swap');
+
+:root {
+  /* Premier League Broadcast Palette */
+  --pl-purple: #6b21a8;
+  --pl-purple-dark: #1a0a2e;
+  --pl-purple-light: #9333ea;
+  --pl-gold: #ffd700;
+  --pl-gold-dark: #b8860b;
+  --pl-green: #00ff85;
+  --pl-green-dark: #00cc6a;
+  --pl-blue: #00d4ff;
+  --pl-red: #ff3333;
+  --pl-orange: #ff6b35;
+  
+  /* Enhanced Dark Theme */
+  --ink: #0a0a0f;
+  --surface: #12121a;
+  --surface-alt: #1a1a25;
+  --surface-hi: #22222f;
+  --border: #2a2a3a;
+  --border-glow: rgba(107, 33, 168, 0.3);
+  
+  /* Text Colors */
+  --text: #f0f0f5;
+  --text-muted: #9ca3af;
+  --text-dim: #6b7280;
+  
+  /* Gradient Backgrounds */
+  --gradient-broadcast: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%);
+  --gradient-matchday: linear-gradient(180deg, #0d0d15 0%, #1a1a2e 50%, #0d0d15 100%);
+  --gradient-hero: linear-gradient(160deg, #1a0a2e 0%, #2d1b4e 30%, #1a0a2e 70%, #0d0d15 100%);
+  --gradient-card: linear-gradient(145deg, rgba(30, 30, 45, 0.95), rgba(20, 20, 30, 0.98));
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(26, 26, 38, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: blur(20px);
+  
+  /* Shadows */
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(107, 33, 168, 0.4);
+  --shadow-gold: 0 0 15px rgba(255, 215, 0, 0.3);
+  
+  /* Animations */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* Base Theme Application */
+body {
+  background: var(--gradient-matchday);
+  background-attachment: fixed;
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* Broadcast-style Grid Background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(107, 33, 168, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(107, 33, 168, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Stadium Atmosphere Overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(107, 33, 168, 0.15) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Content Wrapper */
+.content-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+/* Enhanced Card Styles */
+.card {
+  background: var(--gradient-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-card);
+  backdrop-filter: var(--glass-blur);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--pl-purple), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.card:hover {
+  border-color: var(--pl-purple);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* Premium Card with Gold Accents */
+.card-premium {
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  background: linear-gradient(145deg, rgba(40, 35, 30, 0.95), rgba(25, 20, 15, 0.98));
+}
+
+.card-premium:hover {
+  border-color: var(--pl-gold);
+  box-shadow: var(--shadow-gold);
+}
+
+/* Button Enhancements */
+.btn {
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--pl-purple), var(--pl-purple-light));
+  border: 1px solid var(--pl-purple-light);
+  color: white;
+  box-shadow: 0 4px 15px rgba(107, 33, 168, 0.4);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--pl-purple-light), var(--pl-purple));
+  box-shadow: 0 6px 20px rgba(107, 33, 168, 0.6);
+  transform: translateY(-2px);
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--pl-gold), var(--pl-gold-dark));
+  border: 1px solid var(--pl-gold);
+  color: #1a1a2e;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.btn-gold:hover {
+  background: linear-gradient(135deg, var(--pl-gold-dark), var(--pl-gold));
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+  transform: translateY(-2px);
+}
+
+.btn-green {
+  background: linear-gradient(135deg, var(--pl-green), var(--pl-green-dark));
+  border: 1px solid var(--pl-green);
+  color: #1a1a2e;
+  box-shadow: 0 4px 15px rgba(0, 255, 133, 0.4);
+}
+
+.btn-green:hover {
+  background: linear-gradient(135deg, var(--pl-green-dark), var(--pl-green));
+  box-shadow: 0 6px 20px rgba(0, 255, 133, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Live Indicator */
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(255, 51, 51, 0.1);
+  border: 1px solid rgba(255, 51, 51, 0.3);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--pl-red);
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--pl-red);
+  border-radius: 50%;
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+/* Team Color Utilities */
+.team-text-ars { color: #EF0107; }
+.team-bg-ars { background: #EF0107; }
+.team-border-ars { border-color: #EF0107; }
+
+.team-text-mci { color: #6CABDD; }
+.team-bg-mci { background: #6CABDD; }
+.team-border-mci { border-color: #6CABDD; }
+
+.team-text-liv { color: #C8102E; }
+.team-bg-liv { background: #C8102E; }
+.team-border-liv { border-color: #C8102E; }
+
+.team-text-che { color: #034694; }
+.team-bg-che { background: #034694; }
+.team-border-che { border-color: #034694; }
+
+.team-text-mun { color: #DA291C; }
+.team-bg-mun { background: #DA291C; }
+.team-border-mun { border-color: #DA291C; }
+
+.team-text-tot { color: #132257; }
+.team-bg-tot { background: #132257; }
+.team-border-tot { border-color: #132257; }
+
+.team-text-avl { color: #670E36; }
+.team-bg-avl { background: #670E36; }
+.team-border-avl { border-color: #670E36; }
+
+/* Score Display Typography */
+.score-display {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 3rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.score-time {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+/* Broadcast Style Headers */
+.broadcast-header {
+  position: relative;
+  padding: 20px 0;
+  border-bottom: 2px solid var(--pl-purple);
+  margin-bottom: 24px;
+}
+
+.broadcast-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: var(--pl-gold);
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--pl-gold), var(--pl-purple-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow Effects */
+.glow-purple {
+  box-shadow: 0 0 20px rgba(107, 33, 168, 0.5);
+}
+
+.glow-gold {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px rgba(0, 255, 133, 0.5);
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: all var(--transition-normal);
+}
+
+.theme-toggle:hover {
+  background: var(--pl-purple);
+  border-color: var(--pl-purple);
+  transform: scale(1.1);
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+  .card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  
+  .score-display {
+    font-size: 2rem;
+  }
+  
+  .btn {
+    padding: 10px 16px;
+    font-size: 0.875rem;
+  }
+}
+
+/* Loading States */
+.loading-shimmer {
+  background: linear-gradient(90deg, var(--surface-alt) 25%, var(--surface-hi) 50%, var(--surface-alt) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--pl-purple);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--pl-purple-light);
+}
+
+/* Focus States for Accessibility */
+:focus-visible {
+  outline: 2px solid var(--pl-gold);
+  outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

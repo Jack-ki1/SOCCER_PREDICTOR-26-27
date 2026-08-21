@@ -2,19 +2,300 @@
 {% block title %}Analytics — EPL Predictor{% endblock %}
 {% block content %}
 <div class="container">
-  <div class="page-intro"><div><span class="eyebrow">Club intelligence</span><h1>Twenty identities. One league.</h1></div><p>Explore the attributes behind every forecast. Attack, defence and home advantage are shown as model signals, not final truths.</p></div>
-  <div class="plot-grid mb-3"><div class="content-plot"><span class="eyebrow">League attacking profile</span><div class="content-plot__bars"><i style="height:34%"></i><i style="height:63%"></i><i style="height:47%"></i><i style="height:82%"></i><i style="height:53%"></i><i style="height:76%"></i><i style="height:41%"></i><i style="height:68%"></i><i style="height:58%"></i><i style="height:89%"></i><i style="height:50%"></i><i style="height:72%"></i></div><div class="content-plot__key"><span>Relative attacking signal</span><b>Model view</b></div></div><div class="football-note"><b>Read the shape.</b><br>Hover each club card to compare the blended team ratings.</div></div>
-  <div class="card">
-    <h2 style="margin-top:0;">All 20 clubs — attack / defence / home edge</h2>
+  <!-- Enhanced Page Intro -->
+  <div class="page-intro animate-on-scroll">
+    <div>
+      <span class="eyebrow">Club intelligence</span>
+      <h1>Twenty identities. One league.</h1>
+    </div>
+    <p>Explore the attributes behind every forecast. Attack, defence and home advantage are shown as model signals, not final truths.</p>
+  </div>
+  
+  <!-- Enhanced Plot Grid -->
+  <div class="plot-grid mb-3 animate-on-scroll">
+    <div class="content-plot">
+      <span class="eyebrow">League attacking profile</span>
+      <div class="content-plot__bars">
+        <i style="height:34%"></i>
+        <i style="height:63%"></i>
+        <i style="height:47%"></i>
+        <i style="height:82%"></i>
+        <i style="height:53%"></i>
+        <i style="height:76%"></i>
+        <i style="height:41%"></i>
+        <i style="height:68%"></i>
+        <i style="height:58%"></i>
+        <i style="height:89%"></i>
+        <i style="height:50%"></i>
+        <i style="height:72%"></i>
+      </div>
+      <div class="content-plot__key">
+        <span>Relative attacking signal</span>
+        <b>Model view</b>
+      </div>
+    </div>
+    <div class="football-note">
+      <b>Read the shape.</b>
+      <br>Hover each club card to compare the blended team ratings.
+    </div>
+  </div>
+  
+  <!-- Enhanced Analytics Card -->
+  <div class="card card-premium">
+    <div class="section-heading">
+      <h2 style="margin:0;">All 20 clubs — attack / defence / home edge</h2>
+      <div class="analytics-controls">
+        <button class="filter-btn active" data-sort="attack">Sort by Attack</button>
+        <button class="filter-btn" data-sort="defense">Sort by Defense</button>
+        <button class="filter-btn" data-sort="overall">Overall Rating</button>
+      </div>
+    </div>
     <p class="sub fs-12">Illustrative model inputs, not scraped provider data — see Settings to pull live ratings.</p>
-    <div class="grid grid-3" id="team-grid"></div>
+    
+    <!-- Enhanced Team Grid -->
+    <div class="grid grid-3 team-grid" id="team-grid">
+      <!-- Team cards will be rendered here -->
+    </div>
+  </div>
+  
+  <!-- Team Comparison Tool -->
+  <div class="card team-comparison-container" id="team-comparison">
+    <div class="section-heading">
+      <h2 style="margin:0;">Team Comparison</h2>
+      <button class="btn btn-outline btn-sm" onclick="resetComparison()">Reset</button>
+    </div>
+    <p class="sub fs-12">Select up to 4 teams to compare their attributes side-by-side.</p>
+    
+    <!-- Team Selector -->
+    <div class="team-selector mb-3">
+      <div class="selector-label">Select teams to compare:</div>
+      <div class="team-options">
+        {% for team in teams %}
+        <button class="team-option" data-team-id="{{ team.id }}" data-team-name="{{ team.name }}" data-team-color="{{ team.color }}">
+          <span class="team-option-crest" style="background: {{ team.color }};">{{ team.short }}</span>
+          {{ team.name }}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+    
+    <!-- Comparison Grid -->
+    <div class="comparison-grid" id="comparison-grid">
+      <div class="empty-state">
+        <div class="empty-state-icon">📊</div>
+        <div class="empty-state-title">Select teams to compare</div>
+        <div class="empty-state-description">Choose up to 4 teams to see detailed comparisons</div>
+      </div>
+    </div>
+    
+    <!-- Radar Chart -->
+    <div class="radar-chart-container">
+      <canvas id="team-radar-chart" height="300"></canvas>
+    </div>
+  </div>
+  
+  <!-- League Statistics -->
+  <div class="card">
+    <h2 style="margin-top:0;">League-wide Analytics</h2>
+    <div class="grid grid-2">
+      <div class="stat-block">
+        <h3>Attacking Leaders</h3>
+        <div class="leaders-list" id="attack-leaders">
+          <!-- Will be populated by JS -->
+        </div>
+      </div>
+      <div class="stat-block">
+        <h3>Defensive Leaders</h3>
+        <div class="leaders-list" id="defense-leaders">
+          <!-- Will be populated by JS -->
+        </div>
+      </div>
+      <div class="stat-block">
+        <h3>Home Advantage Kings</h3>
+        <div class="leaders-list" id="home-advantage-leaders">
+          <!-- Will be populated by JS -->
+        </div>
+      </div>
+      <div class="stat-block">
+        <h3>Form Teams</h3>
+        <div class="leaders-list" id="form-leaders">
+          <!-- Will be populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Head-to-Head Matrix -->
+  <div class="card">
+    <h2 style="margin-top:0;">Head-to-Head Matrix</h2>
+    <p class="sub fs-12">Historical head-to-head records between all teams (illustrative data).</p>
+    <div class="h2h-matrix" id="h2h-matrix">
+      <!-- H2H matrix will be rendered here -->
+    </div>
   </div>
 </div>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename='analytics-experience.js') }}"></script>
 <script src="{{ url_for('static', filename='analytics.js') }}"></script>
+<script src="{{ url_for('static', filename='team-comparison.js') }}"></script>
 <script>
-window.addEventListener('DOMContentLoaded', () => renderTeamGrid({{ teams | tojson }}));
+const teamsData = {{ teams | tojson }};
+
+function renderTeamGrid(teams) {
+  const container = document.getElementById('team-grid');
+  if (!container) return;
+  
+  container.innerHTML = teams.map((team, index) => {
+    const overallRating = ((team.attack + team.defense + team.home_adv) / 3).toFixed(0);
+    const formWins = team.form ? team.form.filter(f => f === 'W').length : 0;
+    
+    return `
+      <div class="team-card animate-on-scroll" style="animation-delay: ${index * 0.05}s;" data-team-id="${team.id}">
+        <div class="team-card-header">
+          <span class="team-crest" style="background: ${team.color};">${team.short}</span>
+          <div class="team-info">
+            <div class="team-name">${team.name}</div>
+            <div class="team-tag">${team.tag}</div>
+          </div>
+        </div>
+        <div class="team-ratings">
+          <div class="rating-row">
+            <span class="rating-label">Attack</span>
+            <div class="rating-bar">
+              <div class="rating-fill" style="width: ${team.attack}%; background: linear-gradient(90deg, var(--pl-purple), var(--pl-red));"></div>
+            </div>
+            <span class="rating-value">${team.attack}</span>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">Defense</span>
+            <div class="rating-bar">
+              <div class="rating-fill" style="width: ${team.defense}%; background: linear-gradient(90deg, var(--pl-blue), var(--pl-green));"></div>
+            </div>
+            <span class="rating-value">${team.defense}</span>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">Home Edge</span>
+            <div class="rating-bar">
+              <div class="rating-fill" style="width: ${team.home_adv}%; background: linear-gradient(90deg, var(--pl-gold), var(--pl-orange));"></div>
+            </div>
+            <span class="rating-value">${team.home_adv}</span>
+          </div>
+        </div>
+        <div class="team-overall">
+          <span class="overall-label">Overall</span>
+          <span class="overall-value">${overallRating}</span>
+        </div>
+        <div class="team-form">
+          ${team.form ? team.form.map(result => {
+            const bgClass = result === 'W' ? 'form-result--win' : result === 'D' ? 'form-result--draw' : 'form-result--loss';
+            return `<span class="form-result ${bgClass}">${result}</span>`;
+          }).join('') : '<span class="muted fs-11">New to division</span>'}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderLeadersLists(teams) {
+  // Sort by different attributes
+  const attackLeaders = [...teams].sort((a, b) => b.attack - a.attack).slice(0, 5);
+  const defenseLeaders = [...teams].sort((a, b) => b.defense - a.defense).slice(0, 5);
+  const homeAdvantageLeaders = [...teams].sort((a, b) => b.home_adv - a.home_adv).slice(0, 5);
+  const formLeaders = [...teams].filter(t => t.form).sort((a, b) => {
+    const aWins = a.form.filter(f => f === 'W').length;
+    const bWins = b.form.filter(f => f === 'W').length;
+    return bWins - aWins;
+  }).slice(0, 5);
+  
+  const renderLeader = (team, stat, statLabel) => `
+    <div class="leader-item">
+      <span class="leader-crest" style="background: ${team.color};">${team.short}</span>
+      <span class="leader-name">${team.name}</span>
+      <span class="leader-stat">${statLabel}: <strong>${stat}</strong></span>
+    </div>
+  `;
+  
+  document.getElementById('attack-leaders').innerHTML = attackLeaders.map(t => renderLeader(t, t.attack, 'Att')).join('');
+  document.getElementById('defense-leaders').innerHTML = defenseLeaders.map(t => renderLeader(t, t.defense, 'Def')).join('');
+  document.getElementById('home-advantage-leaders').innerHTML = homeAdvantageLeaders.map(t => renderLeader(t, t.home_adv, 'Home')).join('');
+  document.getElementById('form-leaders').innerHTML = formLeaders.map(t => {
+    const wins = t.form.filter(f => f === 'W').length;
+    return renderLeader(t, `${wins}/5`, 'Form');
+  }).join('');
+}
+
+function renderH2HMatrix(teams) {
+  const container = document.getElementById('h2h-matrix');
+  if (!container) return;
+  
+  // Simplified H2H matrix (in a real app, this would use actual historical data)
+  const matrixHTML = `
+    <div class="h2h-matrix-table">
+      <table class="h2h-table">
+        <thead>
+          <tr>
+            <th></th>
+            ${teams.slice(0, 6).map(t => `<th><span class="matrix-crest" style="background: ${t.color};">${t.short}</span></th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${teams.slice(0, 6).map(homeTeam => `
+            <tr>
+              <th><span class="matrix-crest" style="background: ${homeTeam.color};">${homeTeam.short}</span></th>
+              ${teams.slice(0, 6).map(awayTeam => {
+                if (homeTeam.id === awayTeam.id) {
+                  return '<td class="h2h-diagonal">—</td>';
+                }
+                // Generate illustrative H2H record
+                const homeWins = Math.floor(Math.random() * 3);
+                const awayWins = Math.floor(Math.random() * 3);
+                const draws = Math.floor(Math.random() * 2);
+                return `<td class="h2h-cell">
+                  <span class="h2h-record">${homeWins}W-${draws}D-${awayWins}W</span>
+                </td>`;
+              }).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <p class="sub fs-12" style="text-align: center; margin-top: 12px;">Showing first 6 teams for demonstration</p>
+  `;
+  
+  container.innerHTML = matrixHTML;
+}
+
+// Sorting functionality
+document.querySelectorAll('.analytics-controls .filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.analytics-controls .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    const sortBy = btn.dataset.sort;
+    let sortedTeams;
+    
+    if (sortBy === 'attack') {
+      sortedTeams = [...teamsData].sort((a, b) => b.attack - a.attack);
+    } else if (sortBy === 'defense') {
+      sortedTeams = [...teamsData].sort((a, b) => b.defense - a.defense);
+    } else {
+      sortedTeams = [...teamsData].sort((a, b) => {
+        const aOverall = (a.attack + a.defense + a.home_adv) / 3;
+        const bOverall = (b.attack + b.defense + b.home_adv) / 3;
+        return bOverall - aOverall;
+      });
+    }
+    
+    renderTeamGrid(sortedTeams);
+  });
+});
+
+// Initialize on page load
+window.addEventListener('DOMContentLoaded', () => {
+  renderTeamGrid(teamsData);
+  renderLeadersLists(teamsData);
+  renderH2HMatrix(teamsData);
+});
 </script>
 {% endblock %}

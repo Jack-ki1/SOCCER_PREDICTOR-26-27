@@ -4,8 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}EPL Predictor{% endblock %}</title>
-  <meta name="theme-color" content="#f6f7fb">
+  <meta name="theme-color" content="#1a0a2e">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='themes/premier-league.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='animations.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='components/fixtures.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='components/predictions.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='components/simulation.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='mobile/responsive.css') }}">
   <script src="{{ url_for('static', filename='chart.min.js') }}"></script>
 </head>
 <body>
@@ -35,6 +41,16 @@
     EPL Predictor — base template. Team ratings are illustrative model inputs until live/fitted data is connected.
     Not affiliated with the Premier League.
   <script src="{{ url_for('static', filename='common.js') }}"></script>
+  <script src="{{ url_for('static', filename='animations.js') }}"></script>
+  <script src="{{ url_for('static', filename='fixture-carousel.js') }}"></script>
+  <script src="{{ url_for('static', filename='prediction-theater.js') }}"></script>
+  <script src="{{ url_for('static', filename='simulation-visualizer.js') }}"></script>
+  <script src="{{ url_for('static', filename='team-comparison.js') }}"></script>
+  <script src="{{ url_for('static', filename='model-explainer.js') }}"></script>
+  <script src="{{ url_for('static', filename='keyboard-shortcuts.js') }}"></script>
+  <script src="{{ url_for('static', filename='pwa-manager.js') }}"></script>
+  <script src="{{ url_for('static', filename='gamification.js') }}"></script>
+  <script src="{{ url_for('static', filename='performance-optimizer.js') }}"></script>
   <script>
     const toggle = document.querySelector('.nav-toggle');
     const navigation = document.querySelector('.nav-links');

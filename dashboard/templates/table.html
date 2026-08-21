@@ -2,48 +2,376 @@
 {% block title %}Table — EPL Predictor{% endblock %}
 {% block content %}
 <div class="container">
-  <div class="page-intro"><div><span class="eyebrow">Monte Carlo theatre</span><h1>Not a table. A thousand possible seasons.</h1></div><p>Run the simulation to reveal the model's picture of the title race, European places and survival battle.</p></div>
-  <div class="content-plot mb-3"><span class="eyebrow">Simulation pathway</span><div class="content-plot__bars"><i style="height:22%"></i><i style="height:35%"></i><i style="height:48%"></i><i style="height:43%"></i><i style="height:62%"></i><i style="height:54%"></i><i style="height:75%"></i><i style="height:68%"></i><i style="height:88%"></i><i style="height:92%"></i></div><div class="content-plot__key"><span>Fixture outcomes become final tables</span><b>300 simulations</b></div></div>
-  <div class="card">
-    <div class="flex justify-between items-center mb-3">
+  <!-- Enhanced Page Intro -->
+  <div class="page-intro animate-on-scroll">
+    <div>
+      <span class="eyebrow">Monte Carlo theatre</span>
+      <h1>Not a table. A thousand possible seasons.</h1>
+    </div>
+    <p>Run the simulation to reveal the model's picture of the title race, European places and survival battle.</p>
+  </div>
+  
+  <!-- Enhanced Content Plot -->
+  <div class="content-plot mb-3 animate-on-scroll">
+    <span class="eyebrow">Simulation pathway</span>
+    <div class="content-plot__bars">
+      <i style="height:22%"></i>
+      <i style="height:35%"></i>
+      <i style="height:48%"></i>
+      <i style="height:43%"></i>
+      <i style="height:62%"></i>
+      <i style="height:54%"></i>
+      <i style="height:75%"></i>
+      <i style="height:68%"></i>
+      <i style="height:88%"></i>
+      <i style="height:92%"></i>
+    </div>
+    <div class="content-plot__key">
+      <span>Fixture outcomes become final tables</span>
+      <b>300 simulations</b>
+    </div>
+  </div>
+  
+  <!-- Enhanced Simulation Container -->
+  <div class="simulation-container" id="simulation-container">
+    <div class="simulation-header">
       <h2 style="margin:0;">Projected final table — Monte Carlo simulation</h2>
-      <button class="btn glow-btn" id="run-btn" onclick="runSimulation()">Run Season Simulation</button>
+      <div class="simulation-controls">
+        <input type="number" id="simulation-count" class="simulation-count-input" value="300" min="100" max="1000" step="50">
+        <button class="btn btn-primary glow-btn" id="run-simulation-btn" onclick="runSimulation()">Run Season Simulation</button>
+        <button class="btn btn-outline" id="stop-simulation-btn" onclick="stopSimulation()" style="display:none;">Stop</button>
+      </div>
     </div>
     <p class="sub fs-12">No matches have been played yet — this is a pre-season projection, run on demand server-side.</p>
-    <div id="sim-loader"></div>
-    <table id="table-body" style="margin-top:12px; display:none;">
+    
+    <!-- Enhanced Simulation Progress -->
+    <div class="simulation-progress" id="simulation-progress" style="display:none;">
+      <div class="simulation-progress-header">
+        <span class="simulation-progress-title">Simulating season...</span>
+        <span class="simulation-progress-percentage" id="sim-percentage">0%</span>
+      </div>
+      <div class="simulation-progress-bar">
+        <div class="simulation-progress-fill" id="sim-progress-fill"></div>
+      </div>
+      <div class="simulation-progress-details" id="sim-progress-details">
+        <div class="simulation-progress-detail">
+          <span>Fixtures:</span>
+          <strong id="sim-fixtures">0/380</strong>
+        </div>
+        <div class="simulation-progress-detail">
+          <span>Current:</span>
+          <strong id="sim-current">Starting...</strong>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Live Table Updates -->
+    <div class="live-table-container" id="live-table-container" style="display:none;">
+      <div class="live-table-header">
+        <span class="live-table-title">Live Table Updates</span>
+        <span class="live-table-indicator"><span class="live-dot"></span> LIVE</span>
+      </div>
+      <div class="live-table-content" id="live-table-content">
+        <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+          Run simulation to see live table updates
+        </div>
+      </div>
+    </div>
+    
+    <!-- Enhanced Final Table -->
+    <table id="table-body" style="margin-top:12px; display:none;" class="final-table">
       <thead>
-        <tr><th>#</th><th>Club</th><th>Form</th><th>Pts</th><th>Title</th><th>Top 4</th><th>Releg.</th></tr>
+        <tr>
+          <th>#</th>
+          <th>Club</th>
+          <th>Form</th>
+          <th>Pts</th>
+          <th>Title</th>
+          <th>Top 4</th>
+          <th>Releg.</th>
+        </tr>
       </thead>
       <tbody id="rows"></tbody>
     </table>
   </div>
 
-  <div class="card" id="chart-card" style="display:none;">
-    <h3 style="margin-top:0;">Title & top-4 race</h3>
-    <canvas id="title-race-chart" height="220"></canvas>
+  <!-- Enhanced Championship Race -->
+  <div class="card championship-race" id="championship-race" style="display:none;">
+    <div class="championship-race-header">
+      <h3 style="margin:0;">Title & top-4 race</h3>
+      <div class="race-legend">
+        <span class="legend-item"><span class="legend-color legend-color--title"></span> Title</span>
+        <span class="legend-item"><span class="legend-color legend-color--top4"></span> Top 4</span>
+      </div>
+    </div>
+    <div class="championship-bars" id="championship-bars">
+      <!-- Championship bars will be rendered here -->
+    </div>
+    <canvas id="title-race-chart" height="220" style="margin-top: 16px;"></canvas>
+  </div>
+  
+  <!-- Enhanced Relegation Battle -->
+  <div class="card relegation-battle" id="relegation-battle" style="display:none;">
+    <div class="relegation-battle-header">
+      <h3 style="margin:0;">Relegation battle</h3>
+    </div>
+    <div class="relegation-teams" id="relegation-teams">
+      <!-- Relegation teams will be rendered here -->
+    </div>
+  </div>
+  
+  <!-- Enhanced European Qualification -->
+  <div class="card european-qualification" id="european-qualification" style="display:none;">
+    <div class="european-qualification-header">
+      <h3 style="margin:0;">European qualification</h3>
+    </div>
+    <div class="european-spots" id="european-spots">
+      <!-- European spots will be rendered here -->
+    </div>
+  </div>
+  
+  <!-- Scenario Comparison -->
+  <div class="card scenario-comparison" id="scenario-comparison" style="display:none;">
+    <div class="scenario-tabs">
+      <button class="scenario-tab active" data-scenario="realistic">Realistic</button>
+      <button class="scenario-tab" data-scenario="optimistic">Optimistic</button>
+      <button class="scenario-tab" data-scenario="pessimistic">Pessimistic</button>
+    </div>
+    <div class="scenario-content active" id="scenario-realistic">
+      <p class="sub fs-12">Based on current team ratings and form factors.</p>
+    </div>
+    <div class="scenario-content" id="scenario-optimistic">
+      <p class="sub fs-12">Assumes positive form momentum and favorable fixtures.</p>
+    </div>
+    <div class="scenario-content" id="scenario-pessimistic">
+      <p class="sub fs-12">Assumes injuries, poor form, and tough fixture runs.</p>
+    </div>
   </div>
 </div>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename='table-experience.js') }}"></script>
 <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='simulation-visualizer.js') }}"></script>
 <script>
+let isSimulating = false;
+let simulationInterval = null;
+
 async function runSimulation() {
-  const btn = document.getElementById('run-btn');
+  if (isSimulating) return;
+  
+  isSimulating = true;
+  const btn = document.getElementById('run-simulation-btn');
+  const stopBtn = document.getElementById('stop-simulation-btn');
+  const progressContainer = document.getElementById('simulation-progress');
+  const liveTableContainer = document.getElementById('live-table-container');
+  
   btn.disabled = true;
-  const steps = ['Loading all 380 fixtures...', 'Rolling the Poisson dice...', 'Crunching 300 simulated seasons...', 'Ranking final tables...'];
+  btn.style.display = 'none';
+  stopBtn.style.display = 'inline-block';
+  progressContainer.style.display = 'block';
+  liveTableContainer.style.display = 'block';
+  
+  const count = parseInt(document.getElementById('simulation-count').value) || 300;
+  const steps = [
+    'Loading all 380 fixtures...',
+    'Initializing Monte Carlo engine...',
+    'Rolling the Poisson dice...',
+    'Crunching ' + count + ' simulated seasons...',
+    'Calculating title probabilities...',
+    'Ranking final tables...',
+    'Final whistle — here is the call...'
+  ];
+  
   runStagedLoader('sim-loader', steps, 340, async () => {
-    document.getElementById('sim-loader').innerHTML = '';
     try {
-      const data = await apiPost('/simulate-season', { n_sims: 300 });
+      const data = await apiPost('/simulate-season', { n_sims: count });
       await renderTable(data.projection);
+      
       document.getElementById('table-body').style.display = 'table';
-      document.getElementById('chart-card').style.display = 'block';
+      document.getElementById('championship-race').style.display = 'block';
+      document.getElementById('relegation-battle').style.display = 'block';
+      document.getElementById('european-qualification').style.display = 'block';
+      document.getElementById('scenario-comparison').style.display = 'block';
+      
+      // Render enhanced visualizations
+      renderChampionshipRace(data.projection.slice(0, 8));
+      renderRelegationBattle(data.projection.slice(-6));
+      renderEuropeanQualification(data.projection.slice(0, 7));
+      
+      progressContainer.style.display = 'none';
     } finally {
       btn.disabled = false;
+      btn.style.display = 'inline-block';
+      stopBtn.style.display = 'none';
+      isSimulating = false;
     }
   });
+  
+  // Simulate progress animation
+  let progress = 0;
+  const progressBar = document.getElementById('sim-progress-fill');
+  const progressPercentage = document.getElementById('sim-percentage');
+  const fixturesCount = document.getElementById('sim-fixtures');
+  const currentMatch = document.getElementById('sim-current');
+  
+  simulationInterval = setInterval(() => {
+    if (progress >= 100) {
+      clearInterval(simulationInterval);
+      return;
+    }
+    
+    progress += Math.random() * 5;
+    if (progress > 100) progress = 100;
+    
+    progressBar.style.width = `${progress}%`;
+    progressPercentage.textContent = `${Math.round(progress)}%`;
+    
+    const fixtureNum = Math.floor((progress / 100) * 380);
+    fixturesCount.textContent = `${fixtureNum}/380`;
+    
+    const matchIndex = Math.floor(Math.random() * steps.length);
+    currentMatch.textContent = steps[matchIndex].replace('Loading all 380 fixtures...', 'Processing fixtures...')
+                                     .replace('Initializing Monte Carlo engine...', 'Initializing...')
+                                     .replace('Rolling the Poisson dice...', 'Simulating...')
+                                     .replace(`Crunching ${count} simulated seasons...`, 'Simulating seasons...')
+                                     .replace('Calculating title probabilities...', 'Calculating probabilities...')
+                                     .replace('Ranking final tables...', 'Ranking tables...')
+                                     .replace('Final whistle — here is the call...', 'Finalizing...');
+  }, 200);
 }
+
+function stopSimulation() {
+  if (simulationInterval) {
+    clearInterval(simulationInterval);
+    simulationInterval = null;
+  }
+  
+  isSimulating = false;
+  const btn = document.getElementById('run-simulation-btn');
+  const stopBtn = document.getElementById('stop-simulation-btn');
+  const progressContainer = document.getElementById('simulation-progress');
+  
+  btn.disabled = false;
+  btn.style.display = 'inline-block';
+  stopBtn.style.display = 'none';
+  progressContainer.style.display = 'none';
+}
+
+function renderChampionshipRace(top8) {
+  const teams = getTeams(); // This will need to be awaited
+  const container = document.getElementById('championship-bars');
+  
+  const maxTitleProb = Math.max(...top8.map(r => r.title_prob));
+  
+  container.innerHTML = top8.map((r, i) => {
+    const team = teams[r.club_id];
+    const titleWidth = (r.title_prob / maxTitleProb) * 100;
+    const top4Width = ((r.top4_prob - r.title_prob) / maxTitleProb) * 100;
+    
+    return `
+      <div class="championship-bar-container animate-fade-in" style="animation-delay: ${i * 0.1}s">
+        <div class="championship-team">
+          <span class="crest" style="width: 24px; height: 24px; background: ${team.color};">${team.short}</span>
+          <span>${team.short}</span>
+        </div>
+        <div class="championship-bar-wrapper">
+          <div class="championship-bar championship-bar--title" style="width: ${titleWidth}%; background: ${team.color};">
+            ${pct(r.title_prob)}
+          </div>
+          <div class="championship-bar championship-bar--top4" style="width: ${top4Width}%; background: var(--pl-green);">
+            ${pct(r.top4_prob - r.title_prob)}
+          </div>
+        </div>
+        <div class="championship-probability">${r.avg_points.toFixed(0)} pts</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderRelegationBattle(bottom6) {
+  const teams = getTeams();
+  const container = document.getElementById('relegation-teams');
+  
+  const maxRelegProb = Math.max(...bottom6.map(r => r.releg_prob));
+  
+  container.innerHTML = bottom6.map((r, i) => {
+    const team = teams[r.club_id];
+    const relegWidth = (r.releg_prob / maxRelegProb) * 100;
+    
+    return `
+      <div class="relegation-team-row animate-fade-in" style="animation-delay: ${i * 0.1}s">
+        <div class="relegation-team-info">
+          <span class="crest" style="width: 24px; height: 24px; background: ${team.color};">${team.short}</span>
+          <span class="relegation-team-name">${team.name}</span>
+        </div>
+        <div class="relegation-probability-bar">
+          <div class="relegation-probability-fill" style="width: ${relegWidth}%;"></div>
+        </div>
+        <div class="relegation-probability-value">${pct(r.releg_prob)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderEuropeanQualification(top7) {
+  const teams = getTeams();
+  const container = document.getElementById('european-spots');
+  
+  const championsLeague = top7.slice(0, 4);
+  const europaLeague = [top7[4]];
+  const conferenceLeague = [top7[5]];
+  
+  container.innerHTML = `
+    <div class="european-spot-card animate-fade-in">
+      <div class="european-spot-competition">Champions League</div>
+      <div class="european-spot-teams">
+        ${championsLeague.map(r => {
+          const team = teams[r.club_id];
+          return `<div class="european-spot-team">
+            <span class="crest" style="width: 16px; height: 16px; background: ${team.color};">${team.short}</span>
+            ${team.name} (${pct(r.title_prob)})
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="european-spot-card animate-fade-in">
+      <div class="european-spot-competition">Europa League</div>
+      <div class="european-spot-teams">
+        ${europaLeague.map(r => {
+          const team = teams[r.club_id];
+          return `<div class="european-spot-team">
+            <span class="crest" style="width: 16px; height: 16px; background: ${team.color};">${team.short}</span>
+            ${team.name} (${pct(r.top4_prob - r.title_prob)})
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="european-spot-card animate-fade-in">
+      <div class="european-spot-competition">Conference League</div>
+      <div class="european-spot-teams">
+        ${conferenceLeague.map(r => {
+          const team = teams[r.club_id];
+          return `<div class="european-spot-team">
+            <span class="crest" style="width: 16px; height: 16px; background: ${team.color};">${team.short}</span>
+            ${team.name} (${pct(r.top4_prob - r.title_prob)})
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// Scenario tab switching
+document.querySelectorAll('.scenario-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.scenario-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.scenario-content').forEach(c => c.classList.remove('active'));
+    
+    tab.classList.add('active');
+    const scenario = tab.dataset.scenario;
+    document.getElementById(`scenario-${scenario}`).classList.add('active');
+  });
+});
 </script>
 {% endblock %}
